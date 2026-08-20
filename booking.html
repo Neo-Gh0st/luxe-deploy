@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Бронирование — LUXE Restaurant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header__inner">
+    <a href="index.html" class="header__logo gold-gradient">LUXE</a>
+    <nav class="header__nav">
+      <a href="index.html">Главная</a>
+      <a href="menu.html">Меню</a>
+      <a href="about.html">О нас</a>
+      <a href="contacts.html">Контакты</a>
+      <a href="auth.html" class="header__cta">Войти</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html">Главная</a>
+  <a href="menu.html">Меню</a>
+  <a href="about.html">О нас</a>
+  <a href="contacts.html">Контакты</a>
+  <a href="booking.html">Бронирование</a>
+  <a href="auth.html">Войти</a>
+</nav>
+
+<section class="section" style="padding-top: 120px;">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <h2>Бронирование столика</h2>
+      <p>Выберите удобное время и место для вашего вечера</p>
+      <div class="divider"></div>
+    </div>
+
+    <form class="booking-form animate-on-scroll" id="bookingForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Дата</label>
+          <input type="date" id="bookingDate" required>
+        </div>
+        <div class="form-group">
+          <label>Телефон</label>
+          <input type="tel" placeholder="+380 (__) ___-__-__" required>
+        </div>
+      </div>
+
+      <div class="form-group" id="timeSlotsGroup" style="display:none;">
+        <label>Время</label>
+        <div class="time-slots">
+          <button type="button" class="time-slot">12:00</button>
+          <button type="button" class="time-slot">12:30</button>
+          <button type="button" class="time-slot">13:00</button>
+          <button type="button" class="time-slot">13:30</button>
+          <button type="button" class="time-slot">14:00</button>
+          <button type="button" class="time-slot">14:30</button>
+          <button type="button" class="time-slot">15:00</button>
+          <button type="button" class="time-slot">17:00</button>
+          <button type="button" class="time-slot">17:30</button>
+          <button type="button" class="time-slot">18:00</button>
+          <button type="button" class="time-slot">18:30</button>
+          <button type="button" class="time-slot">19:00</button>
+          <button type="button" class="time-slot">19:30</button>
+          <button type="button" class="time-slot">20:00</button>
+          <button type="button" class="time-slot">20:30</button>
+          <button type="button" class="time-slot">21:00</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Гости</label>
+        <div class="guest-counter">
+          <button type="button" id="guestMinus">−</button>
+          <span id="guestCount">2</span>
+          <button type="button" id="guestPlus">+</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Зал</label>
+        <div class="halls">
+          <button type="button" class="hall-card">
+            <div class="hall-card__icon">🍽️</div>
+            <div class="hall-card__name">Основной зал</div>
+            <div class="hall-card__desc">Элегантная атмосфера</div>
+          </button>
+          <button type="button" class="hall-card">
+            <div class="hall-card__icon"> VIP</div>
+            <div class="hall-card__name">VIP-зона</div>
+            <div class="hall-card__desc">Приватность и комфорт</div>
+          </button>
+          <button type="button" class="hall-card">
+            <div class="hall-card__icon">🌸</div>
+            <div class="hall-card__name">Терраса</div>
+            <div class="hall-card__desc">Открытая зона</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Пожелания</label>
+        <textarea placeholder="Особые пожелания к бронированию..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn--primary" id="bookingSubmit" style="width:100%;">Отправить заявку</button>
+    </form>
+
+    <div class="success-state" id="bookingSuccess" style="display:none;">
+      <div class="success-state__icon">✅</div>
+      <h3>Заявка отправлена!</h3>
+      <p>Мы свяжемся с вами для подтверждения бронирования в ближайшее время.</p>
+      <button class="btn btn--outline" id="bookingReset">Новое бронирование</button>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__logo gold-gradient">LUXE</div>
+        <p class="footer__desc">Ресторан высокой кухни в самом сердце Киева.</p>
+      </div>
+      <div>
+        <div class="footer__heading">Навигация</div>
+        <div class="footer__links">
+          <a href="index.html">Главная</a>
+          <a href="menu.html">Меню</a>
+          <a href="booking.html">Бронирование</a>
+          <a href="about.html">О нас</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer__heading">Контакты</div>
+        <div class="footer__links">
+          <a href="contacts.html">Адрес и карта</a>
+          <a href="tel:+380441234567">+380 (44) 123-45-67</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer__heading">Часы работы</div>
+        <div class="footer__links">
+          <span>Пн–Чт: 12:00 – 23:00</span>
+          <span>Пт–Сб: 12:00 – 01:00</span>
+          <span>Вс: 12:00 – 22:00</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">© 2025 LUXE Restaurant. Все права защищены.</div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

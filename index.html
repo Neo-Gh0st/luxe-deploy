@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUXE Restaurant — Fine Dining Experience</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header__inner">
+    <a href="index.html" class="header__logo gold-gradient">LUXE</a>
+    <nav class="header__nav">
+      <a href="index.html">Главная</a>
+      <a href="menu.html">Меню</a>
+      <a href="about.html">О нас</a>
+      <a href="contacts.html">Контакты</a>
+      <a href="auth.html" class="header__cta">Войти</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <a href="index.html">Главная</a>
+  <a href="menu.html">Меню</a>
+  <a href="about.html">О нас</a>
+  <a href="contacts.html">Контакты</a>
+  <a href="booking.html">Бронирование</a>
+  <a href="auth.html">Войти</a>
+</nav>
+
+<section class="hero">
+  <div class="hero__bg"></div>
+  <div class="container hero__content">
+    <span class="hero__label">Fine Dining</span>
+    <h1 class="hero__title">Искусство <span class="gold-gradient">гастрономии</span></h1>
+    <p class="hero__subtitle">Откройте для себя уникальные вкусы в атмосфере элегантности и уюта. Каждое блюдо — шедевр от наших шеф-поваров.</p>
+    <div class="hero__buttons">
+      <a href="booking.html" class="btn btn--primary">Забронировать столик</a>
+      <a href="menu.html" class="btn btn--outline">Смотреть меню</a>
+    </div>
+  </div>
+  <div class="hero__scroll">Листайте вниз</div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <h2>Наша философия</h2>
+      <p>Мы верим, что еда — это не просто питание, а искусство, объединяющее людей</p>
+      <div class="divider"></div>
+    </div>
+    <div class="values-grid">
+      <div class="value-card animate-on-scroll">
+        <div class="value-card__icon">🌾</div>
+        <h3>Свежие ингредиенты</h3>
+        <p>Работаем напрямую с фермерами. Только сезонные и свежие продукты высшего качества.</p>
+      </div>
+      <div class="value-card animate-on-scroll">
+        <div class="value-card__icon">👨‍🍳</div>
+        <h3>Мастерство шеф-повара</h3>
+        <p>Наш шеф-повар — лауреат международных конкурсов с 15-летним опытом.</p>
+      </div>
+      <div class="value-card animate-on-scroll">
+        <div class="value-card__icon">🍷</div>
+        <h3>Винная карта</h3>
+        <p>Более 200 сортов вина из лучших виноделий мира, подобранных Sommelier.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <h2>Популярные блюда</h2>
+      <p>Самые любимые нашего гости</p>
+      <div class="divider"></div>
+    </div>
+    <div class="dishes-grid">
+      <div class="card animate-on-scroll">
+        <div class="card__image">🥩</div>
+        <div class="card__body">
+          <span class="card__tag">Основное</span>
+          <h3 class="card__title">Стейк Рибай</h3>
+          <p class="card__desc">Мраморная говядина, приготовленная на гриле, с трюфельным маслом и сезонными овощами</p>
+          <span class="card__price">₴ 1 290</span>
+        </div>
+      </div>
+      <div class="card animate-on-scroll">
+        <div class="card__image">🦞</div>
+        <div class="card__body">
+          <span class="card__tag">Морепродукты</span>
+          <h3 class="card__title">Лобстер Термидор</h3>
+          <p class="card__desc">Королевский лобстер в сливочном соусе с грибами и Пармезаном</p>
+          <span class="card__price">₴ 2 490</span>
+        </div>
+      </div>
+      <div class="card animate-on-scroll">
+        <div class="card__image">🍝</div>
+        <div class="card__body">
+          <span class="card__tag">Паста</span>
+          <h3 class="card__title">Трюфельное Карбонара</h3>
+          <p class="card__desc">Домашняя паста с гуанчале, яичным желтком и чёрным трюфелем</p>
+          <span class="card__price">₴ 890</span>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="menu.html" class="btn btn--outline">Смотреть полное меню</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <h2>Галерея</h2>
+      <p>Атмосфера нашего ресторана</p>
+      <div class="divider"></div>
+    </div>
+    <div class="gallery animate-on-scroll">
+      <div class="gallery__item">🍽️</div>
+      <div class="gallery__item">🕯️</div>
+      <div class="gallery__item">🥂</div>
+      <div class="gallery__item">🌿</div>
+      <div class="gallery__item">🎹</div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <h2>Отзывы</h2>
+      <p>Что говорят наши гости</p>
+      <div class="divider"></div>
+    </div>
+    <div class="reviews">
+      <div class="review-card animate-on-scroll">
+        <div class="review-card__stars">★★★★★</div>
+        <p class="review-card__text">«Невероятная атмосфера и безупречная кухня. Стейк Рибай — лучший, что я пробовал. Обязательно вернёмся!»</p>
+        <div class="review-card__author">Оlena K.</div>
+        <div class="review-card__role">Регулярный гость</div>
+      </div>
+      <div class="review-card animate-on-scroll">
+        <div class="review-card__stars">★★★★★</div>
+        <p class="review-card__text">«Отмечали здесь годовщину. Сервис на высшем уровне, вино подобрали идеально. Спасибо за прекрасный вечер!»</p>
+        <div class="review-card__author">Andriy & Maria</div>
+        <div class="review-card__role">Юбилей</div>
+      </div>
+      <div class="review-card animate-on-scroll">
+        <div class="review-card__stars">★★★★★</div>
+        <p class="review-card__text">«Лобстер Термидор — произведение искусства. А винная карта поражает разнообразием. Рекомендую!»</p>
+        <div class="review-card__author">Dmytro S.</div>
+        <div class="review-card__role">Гастроном</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container">
+    <h2 class="animate-on-scroll">Забронируйте <span class="gold-gradient">незабываемый</span> вечер</h2>
+    <p class="animate-on-scroll">Доступные столики на ближайшие дни</p>
+    <a href="booking.html" class="btn btn--primary animate-on-scroll">Забронировать столик</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__logo gold-gradient">LUXE</div>
+        <p class="footer__desc">Ресторан высокой кухни в самом сердце Киева. Изысканные вкусы, элегантная атмосфера, безупречный сервис.</p>
+      </div>
+      <div>
+        <div class="footer__heading">Навигация</div>
+        <div class="footer__links">
+          <a href="index.html">Главная</a>
+          <a href="menu.html">Меню</a>
+          <a href="booking.html">Бронирование</a>
+          <a href="about.html">О нас</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer__heading">Контакты</div>
+        <div class="footer__links">
+          <a href="contacts.html">Адрес и карта</a>
+          <a href="tel:+380441234567">+380 (44) 123-45-67</a>
+          <a href="mailto:info@restaurant-luxe.pp.ua">info@restaurant-luxe.pp.ua</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer__heading">Часы работы</div>
+        <div class="footer__links">
+          <span>Пн–Чт: 12:00 – 23:00</span>
+          <span>Пт–Сб: 12:00 – 01:00</span>
+          <span>Вс: 12:00 – 22:00</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      © 2025 LUXE Restaurant. Все права защищены.
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
