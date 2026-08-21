@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
 const API_URL = 'https://auth.restaurant-luxe.pp.ua'
 
 function initAuth() {
-  const path = window.location.pathname
-
-  if (path.endsWith('auth.html')) {
+  if (document.getElementById('googleBtn') || document.getElementById('authError')) {
     initAuthPage()
-  } else if (path.endsWith('dashboard.html')) {
+  }
+  if (document.getElementById('userName') || document.getElementById('userAvatar')) {
     initDashboardPage()
-  } else if (path.endsWith('admin.html')) {
+  }
+  if (document.getElementById('adminLoginForm') || document.getElementById('adminLoginView')) {
     initAdminPage()
   }
 
@@ -171,6 +171,14 @@ function initAdminPage() {
       const username = document.getElementById('adminUsername').value.trim()
       const password = document.getElementById('adminPassword').value
       const errorEl = document.getElementById('adminLoginError')
+      const submitBtn = form.querySelector('button[type="submit"]')
+      const originalText = submitBtn ? submitBtn.textContent : 'Войти'
+
+      if (submitBtn) {
+        submitBtn.disabled = true
+        submitBtn.textContent = 'Вход...'
+      }
+      if (errorEl) errorEl.style.display = 'none'
 
       fetch(`${API_URL}/api/admin/login`, {
         method: 'POST',
@@ -184,7 +192,7 @@ function initAdminPage() {
             showAdminPanel()
           } else {
             if (errorEl) {
-              errorEl.textContent = data.error || 'Ошибка входа'
+              errorEl.textContent = data.error || 'Неверный логин или пароль'
               errorEl.style.display = 'block'
             }
           }
@@ -195,6 +203,12 @@ function initAdminPage() {
             errorEl.style.display = 'block'
           }
         })
+        .finally(() => {
+          if (submitBtn) {
+            submitBtn.disabled = false
+            submitBtn.textContent = originalText
+          }
+        })
     })
   }
 
@@ -203,7 +217,7 @@ function initAdminPage() {
     logoutBtn.addEventListener('click', () => {
       fetch(`${API_URL}/api/admin/logout`, { method: 'POST', credentials: 'include' })
         .finally(() => {
-          window.location.href = 'admin.html'
+          showAdminLogin()
         })
     })
   }
@@ -212,16 +226,26 @@ function initAdminPage() {
 function showAdminLogin() {
   const loginView = document.getElementById('adminLoginView')
   const panelView = document.getElementById('adminPanelView')
-  if (loginView) loginView.hidden = false
-  if (panelView) panelView.hidden = true
+  if (loginView) {
+    loginView.hidden = false
+    loginView.style.display = 'flex'
+  }
+  if (panelView) {
+    panelView.hidden = true
+    panelView.style.display = 'none'
+  }
 }
 
 function showAdminPanel() {
   const loginView = document.getElementById('adminLoginView')
   const panelView = document.getElementById('adminPanelView')
-  if (loginView) loginView.hidden = true
+  if (loginView) {
+    loginView.hidden = true
+    loginView.style.display = 'none'
+  }
   if (panelView) {
     panelView.hidden = false
+    panelView.style.display = 'block'
     panelView.querySelectorAll('.animate-on-scroll').forEach(el => el.classList.add('animate-on-scroll--visible'))
   }
 
