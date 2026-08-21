@@ -1,0 +1,7 @@
+.git
+*.json
+*.txt
+config.yml
+whois.html
+uah_*.html
+uahosting_*.html

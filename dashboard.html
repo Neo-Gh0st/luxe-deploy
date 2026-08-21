@@ -38,33 +38,26 @@
 <section class="section" style="padding-top: 120px;">
   <div class="container">
     <div class="dashboard-header animate-on-scroll">
-      <div class="dashboard-avatar">A</div>
+      <div class="dashboard-avatar" id="userAvatar">A</div>
       <div>
-        <div class="dashboard-name">Александр</div>
-        <div class="dashboard-email">alex@example.com</div>
+        <div class="dashboard-name" id="userName">Загрузка...</div>
+        <div class="dashboard-email" id="userEmail">Проверка сессии...</div>
       </div>
     </div>
 
     <h2 class="animate-on-scroll" style="margin-bottom: 32px;">Мои бронирования</h2>
 
-    <div class="booking-card animate-on-scroll">
-      <div class="booking-card__info">
-        <h3>Столик на 4 человека</h3>
-        <div class="booking-card__meta">15 марта 2025, 19:00 · Основной зал</div>
-      </div>
-      <span class="booking-card__status booking-card__status--confirmed">Подтверждено</span>
-    </div>
-
-    <div class="booking-card animate-on-scroll">
-      <div class="booking-card__info">
-        <h3>VIP-зона на 6 человек</h3>
-        <div class="booking-card__meta">22 марта 2025, 20:00 · VIP-зона</div>
-      </div>
-      <span class="booking-card__status booking-card__status--pending">Ожидание</span>
+    <div class="bookings-empty animate-on-scroll" id="bookingsEmpty">
+      <div class="bookings-empty__icon">🍽️</div>
+      <p>У вас пока нет бронирований</p>
     </div>
 
     <div style="text-align:center; margin-top:48px;" class="animate-on-scroll">
       <a href="booking.html" class="btn btn--primary">Новое бронирование</a>
+    </div>
+
+    <div style="text-align:center; margin-top:16px;" class="animate-on-scroll">
+      <button class="btn btn--ghost" id="logoutBtn" style="background:transparent;border:1px solid var(--color-border);color:var(--color-text-muted);padding:10px 24px;border-radius:50px;cursor:pointer;">Выйти</button>
     </div>
   </div>
 </section>

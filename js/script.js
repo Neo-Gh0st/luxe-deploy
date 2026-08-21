@@ -10,7 +10,272 @@ document.addEventListener('DOMContentLoaded', () => {
   initGuestCounter()
   initHallCards()
   initTimeSlots()
+  initAuth()
 })
+
+/* ---- Auth ---- */
+const API_URL = 'https://auth.restaurant-luxe.pp.ua'
+
+function initAuth() {
+  const path = window.location.pathname
+
+  if (path.endsWith('auth.html')) {
+    initAuthPage()
+  } else if (path.endsWith('dashboard.html')) {
+    initDashboardPage()
+  } else if (path.endsWith('admin.html')) {
+    initAdminPage()
+  }
+
+  initHeaderAuth()
+}
+
+function showAuthError(message) {
+  const el = document.getElementById('authError')
+  if (!el) return
+  el.textContent = message
+  el.style.display = 'block'
+}
+
+function initAuthPage() {
+  const params = new URLSearchParams(window.location.search)
+  const error = params.get('error')
+  if (error) {
+    const messages = {
+      access_denied: 'Доступ запрещён. Попробуйте ещё раз.',
+      invalid_state: 'Ошибка проверки сессии. Попробуйте снова.',
+      token_exchange: 'Не удалось получить доступ от Google. Попробуйте снова.',
+      userinfo: 'Не удалось получить данные профиля. Попробуйте снова.',
+      server_error: 'Внутренняя ошибка сервера. Попробуйте позже.'
+    }
+    showAuthError(messages[error] || 'Ошибка входа. Попробуйте ещё раз.')
+  }
+
+  fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
+    .then(res => {
+      if (res.ok) window.location.href = 'dashboard.html'
+    })
+    .catch(() => {})
+
+  const googleBtn = document.getElementById('googleBtn')
+  if (googleBtn && window.google && window.google.accounts) {
+    google.accounts.id.initialize({
+      client_id: '933452972431-2k4duni61277l1qkr4tsn25ibqgemhc8.apps.googleusercontent.com',
+      callback: handleGoogleCredential,
+      ux_mode: 'popup'
+    })
+    google.accounts.id.renderButton(googleBtn, {
+      theme: 'outline',
+      size: 'large',
+      shape: 'pill',
+      width: 320
+    })
+  } else if (googleBtn) {
+    googleBtn.innerHTML = '<button class="auth-btn" onclick="location.href=\'' + API_URL + '/api/auth/google\'">Продолжить с Google</button>'
+  }
+}
+
+function handleGoogleCredential(response) {
+  if (!response || !response.credential) {
+    showAuthError('Не удалось получить данные от Google. Попробуйте ещё раз.')
+    return
+  }
+
+  fetch(`${API_URL}/api/auth/google/token`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: response.credential })
+  })
+    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(({ ok, data }) => {
+      if (ok) {
+        window.location.href = 'dashboard.html'
+      } else {
+        showAuthError(data.error || 'Ошибка входа. Попробуйте ещё раз.')
+      }
+    })
+    .catch(() => {
+      showAuthError('Нет связи с сервером. Попробуйте позже.')
+    })
+}
+
+function fillDashboard(user) {
+  const nameEl = document.getElementById('userName')
+  const emailEl = document.getElementById('userEmail')
+  const avatarEl = document.getElementById('userAvatar')
+
+  if (nameEl) nameEl.textContent = user.name || user.email
+  if (emailEl) emailEl.textContent = user.email
+
+  if (avatarEl) {
+    if (user.avatar) {
+      avatarEl.innerHTML = ''
+      const img = document.createElement('img')
+      img.src = user.avatar
+      img.alt = 'Аватар'
+      img.style.width = '100%'
+      img.style.height = '100%'
+      img.style.borderRadius = '50%'
+      img.style.objectFit = 'cover'
+      avatarEl.appendChild(img)
+    } else {
+      avatarEl.textContent = (user.name || user.email || 'U')[0].toUpperCase()
+    }
+  }
+}
+
+function initDashboardPage() {
+  fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
+    .then(res => {
+      if (!res.ok) {
+        window.location.href = 'auth.html'
+        return null
+      }
+      return res.json()
+    })
+    .then(data => {
+      if (data) fillDashboard(data.user)
+    })
+    .catch(() => {
+      window.location.href = 'auth.html'
+    })
+
+  const logoutBtn = document.getElementById('logoutBtn')
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      fetch(`${API_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' })
+        .finally(() => {
+          window.location.href = 'index.html'
+        })
+    })
+  }
+}
+
+function initAdminPage() {
+  const loginView = document.getElementById('adminLoginView')
+  const panelView = document.getElementById('adminPanelView')
+  if (!loginView || !panelView) return
+
+  fetch(`${API_URL}/api/admin/check`, { credentials: 'include' })
+    .then(res => {
+      if (res.ok) showAdminPanel()
+      else showAdminLogin()
+    })
+    .catch(() => showAdminLogin())
+
+  const form = document.getElementById('adminLoginForm')
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const username = document.getElementById('adminUsername').value.trim()
+      const password = document.getElementById('adminPassword').value
+      const errorEl = document.getElementById('adminLoginError')
+
+      fetch(`${API_URL}/api/admin/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+        .then(res => res.json().then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+          if (ok) {
+            showAdminPanel()
+          } else {
+            if (errorEl) {
+              errorEl.textContent = data.error || 'Ошибка входа'
+              errorEl.style.display = 'block'
+            }
+          }
+        })
+        .catch(() => {
+          if (errorEl) {
+            errorEl.textContent = 'Нет связи с сервером. Попробуйте позже.'
+            errorEl.style.display = 'block'
+          }
+        })
+    })
+  }
+
+  const logoutBtn = document.getElementById('adminLogoutBtn')
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      fetch(`${API_URL}/api/admin/logout`, { method: 'POST', credentials: 'include' })
+        .finally(() => {
+          window.location.href = 'admin.html'
+        })
+    })
+  }
+}
+
+function showAdminLogin() {
+  const loginView = document.getElementById('adminLoginView')
+  const panelView = document.getElementById('adminPanelView')
+  if (loginView) loginView.hidden = false
+  if (panelView) panelView.hidden = true
+}
+
+function showAdminPanel() {
+  const loginView = document.getElementById('adminLoginView')
+  const panelView = document.getElementById('adminPanelView')
+  if (loginView) loginView.hidden = true
+  if (panelView) panelView.hidden = false
+
+  fetch(`${API_URL}/api/admin/users`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      const wrap = document.getElementById('adminTableWrap')
+      const empty = document.getElementById('adminEmpty')
+      const tbody = document.getElementById('adminTableBody')
+      if (!tbody) return
+
+      if (!data.users || !data.users.length) {
+        if (wrap) wrap.hidden = true
+        if (empty) empty.hidden = false
+        return
+      }
+
+      const providers = { google: 'Google' }
+      tbody.innerHTML = data.users.map(u => {
+        const avatar = u.avatar
+          ? `<img class="admin-avatar" src="${u.avatar}" alt="">`
+          : `<span style="display:inline-block;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-gold),var(--color-gold-dark));color:var(--color-bg);font-weight:700;text-align:center;line-height:36px;">${(u.name || u.email || 'U')[0].toUpperCase()}</span>`
+        const created = new Date(u.created_at).toLocaleDateString('ru-RU')
+        return `<tr>
+          <td>${avatar} ${u.name || '—'}</td>
+          <td>${u.email}</td>
+          <td>${providers[u.provider] || u.provider}</td>
+          <td>${created}</td>
+        </tr>`
+      }).join('')
+
+      if (wrap) wrap.hidden = false
+      if (empty) empty.hidden = true
+    })
+    .catch(() => {
+      const empty = document.getElementById('adminEmpty')
+      if (empty) empty.hidden = false
+    })
+}
+
+function initHeaderAuth() {
+  const cta = document.querySelector('.header__cta')
+  if (!cta) return
+
+  fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
+    .then(res => {
+      if (!res.ok) return null
+      return res.json()
+    })
+    .then(data => {
+      if (data && data.user) {
+        cta.textContent = 'Кабинет'
+        cta.href = 'dashboard.html'
+      }
+    })
+    .catch(() => {})
+}
 
 /* ---- Mobile Navigation ---- */
 function initMobileNav() {
