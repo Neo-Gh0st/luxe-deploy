@@ -220,10 +220,16 @@ function showAdminPanel() {
   const loginView = document.getElementById('adminLoginView')
   const panelView = document.getElementById('adminPanelView')
   if (loginView) loginView.hidden = true
-  if (panelView) panelView.hidden = false
+  if (panelView) {
+    panelView.hidden = false
+    panelView.querySelectorAll('.animate-on-scroll').forEach(el => el.classList.add('animate-on-scroll--visible'))
+  }
 
   fetch(`${API_URL}/api/admin/users`, { credentials: 'include' })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error('Unauthorized')
+      return res.json()
+    })
     .then(data => {
       const wrap = document.getElementById('adminTableWrap')
       const empty = document.getElementById('adminEmpty')
@@ -232,7 +238,10 @@ function showAdminPanel() {
 
       if (!data.users || !data.users.length) {
         if (wrap) wrap.hidden = true
-        if (empty) empty.hidden = false
+        if (empty) {
+          empty.hidden = false
+          empty.classList.add('animate-on-scroll--visible')
+        }
         return
       }
 
@@ -250,12 +259,18 @@ function showAdminPanel() {
         </tr>`
       }).join('')
 
-      if (wrap) wrap.hidden = false
+      if (wrap) {
+        wrap.hidden = false
+        wrap.classList.add('animate-on-scroll--visible')
+      }
       if (empty) empty.hidden = true
     })
     .catch(() => {
       const empty = document.getElementById('adminEmpty')
-      if (empty) empty.hidden = false
+      if (empty) {
+        empty.hidden = false
+        empty.classList.add('animate-on-scroll--visible')
+      }
     })
 }
 
