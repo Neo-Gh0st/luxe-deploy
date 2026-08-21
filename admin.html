@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Админ-панель — LUXE Restaurant</title>
+  <title>Адмін-панель — LUXE Restaurant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -14,11 +14,11 @@
   <div class="header__inner">
     <a href="index.html" class="header__logo gold-gradient">LUXE</a>
     <nav class="header__nav">
-      <a href="index.html">Главная</a>
+      <a href="index.html">Головна</a>
       <a href="menu.html">Меню</a>
-      <a href="about.html">О нас</a>
-      <a href="contacts.html">Контакты</a>
-      <a href="dashboard.html" class="header__cta">Кабинет</a>
+      <a href="about.html">Про нас</a>
+      <a href="contacts.html">Контакти</a>
+      <a href="dashboard.html" class="header__cta">Кабінет</a>
     </nav>
     <button class="burger" id="burger" aria-label="Меню">
       <span></span><span></span><span></span>
@@ -27,12 +27,12 @@
 </header>
 
 <nav class="mobile-nav" id="mobileNav">
-  <a href="index.html">Главная</a>
+  <a href="index.html">Головна</a>
   <a href="menu.html">Меню</a>
-  <a href="about.html">О нас</a>
-  <a href="contacts.html">Контакты</a>
-  <a href="booking.html">Бронирование</a>
-  <a href="dashboard.html">Кабинет</a>
+  <a href="about.html">Про нас</a>
+  <a href="contacts.html">Контакти</a>
+  <a href="booking.html">Бронювання</a>
+  <a href="dashboard.html">Кабінет</a>
 </nav>
 
 <section class="section" style="padding-top: 120px;">
@@ -41,16 +41,16 @@
     <div id="adminLoginView" class="auth-page" style="padding-top: 0;">
       <div class="auth-card">
         <div class="auth-card__logo gold-gradient">LUXE</div>
-        <p class="auth-card__subtitle">Вход для администратора</p>
+        <p class="auth-card__subtitle">Вхід для адміністратора</p>
 
         <div class="auth-error" id="adminLoginError"></div>
 
         <form id="adminLoginForm" style="display:flex;flex-direction:column;gap:16px;">
-          <input type="text" id="adminUsername" placeholder="Логин" required
+          <input type="text" id="adminUsername" placeholder="Логін" required
             style="padding:14px 18px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:1rem;">
           <input type="password" id="adminPassword" placeholder="Пароль" required
             style="padding:14px 18px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:1rem;">
-          <button type="submit" class="btn btn--primary" style="width:100%;">Войти</button>
+          <button type="submit" class="btn btn--primary" style="width:100%;">Увійти</button>
         </form>
       </div>
     </div>
@@ -59,11 +59,11 @@
       <div class="dashboard-header animate-on-scroll">
         <div class="dashboard-avatar">A</div>
         <div style="flex:1;">
-          <div class="dashboard-name" id="adminName">Администратор</div>
-          <div class="dashboard-email">Панель управления LUXE Restaurant</div>
+          <div class="dashboard-name" id="adminName">Адміністратор</div>
+          <div class="dashboard-email">Панель керування LUXE Restaurant</div>
         </div>
         <div>
-          <button class="btn btn--ghost" id="adminLogoutBtn" style="background:transparent;border:1px solid var(--color-border);color:var(--color-text-muted);padding:8px 20px;border-radius:50px;cursor:pointer;font-size:0.9rem;">Выйти</button>
+          <button class="btn btn--ghost" id="adminLogoutBtn" style="background:transparent;border:1px solid var(--color-border);color:var(--color-text-muted);padding:8px 20px;border-radius:50px;cursor:pointer;font-size:0.9rem;">Вийти</button>
         </div>
       </div>
 
@@ -72,59 +72,59 @@
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">📅</div>
           <div class="admin-stat-card__val" id="statTodayBookings">0</div>
-          <div class="admin-stat-card__label">Броней сегодня</div>
+          <div class="admin-stat-card__label">Бронювань сьогодні</div>
         </div>
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">👥</div>
           <div class="admin-stat-card__val" id="statTodayGuests">0</div>
-          <div class="admin-stat-card__label">Ожидаемых гостей</div>
+          <div class="admin-stat-card__label">Очікуваних гостей</div>
         </div>
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">🪑</div>
           <div class="admin-stat-card__val" id="statTablesOccupied">0 / 12</div>
-          <div class="admin-stat-card__label">Занято столиков</div>
+          <div class="admin-stat-card__label">Зайнято столиків</div>
         </div>
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">🧑‍🍳</div>
           <div class="admin-stat-card__val" id="statStaffOnShift">0 / 0</div>
-          <div class="admin-stat-card__label">Персонал на смене</div>
+          <div class="admin-stat-card__label">Персонал на зміні</div>
         </div>
       </div>
 
       <!-- Admin Tabs Navigation -->
       <div class="admin-tabs animate-on-scroll">
-        <button type="button" class="admin-tab-btn admin-tab-btn--active" data-tab="bookings">🍽️ Бронирования</button>
-        <button type="button" class="admin-tab-btn" data-tab="tables">🪑 Столики и Залы</button>
-        <button type="button" class="admin-tab-btn" data-tab="staff">👥 Рабочий персонал</button>
+        <button type="button" class="admin-tab-btn admin-tab-btn--active" data-tab="bookings">🍽️ Бронювання</button>
+        <button type="button" class="admin-tab-btn" data-tab="tables">🪑 Столики та Зали</button>
+        <button type="button" class="admin-tab-btn" data-tab="staff">👥 Робочий персонал</button>
         <button type="button" class="admin-tab-btn" data-tab="stoplist">📋 Стоп-лист меню</button>
-        <button type="button" class="admin-tab-btn" data-tab="users">👤 Клиенты</button>
+        <button type="button" class="admin-tab-btn" data-tab="users">👤 Клієнти</button>
       </div>
 
       <!-- TAB 1: BOOKINGS -->
       <div class="admin-tab-content" id="tabContentBookings">
         <div class="admin-toolbar">
           <div class="admin-filter-group" id="bookingFilterGroup">
-            <button class="filter-btn filter-btn--active" data-filter="all">Все</button>
-            <button class="filter-btn" data-filter="pending">⏳ Ожидают</button>
-            <button class="filter-btn" data-filter="confirmed">✅ Подтверждены</button>
-            <button class="filter-btn" data-filter="completed">🏁 Завершены</button>
-            <button class="filter-btn" data-filter="cancelled">❌ Отклонены</button>
+            <button class="filter-btn filter-btn--active" data-filter="all">Всі</button>
+            <button class="filter-btn" data-filter="pending">⏳ Очікують</button>
+            <button class="filter-btn" data-filter="confirmed">✅ Підтверджені</button>
+            <button class="filter-btn" data-filter="completed">🏁 Завершені</button>
+            <button class="filter-btn" data-filter="cancelled">❌ Відхилені</button>
           </div>
-          <button class="btn btn--outline" id="btnRefreshBookings" style="padding:8px 18px;font-size:0.85rem;">🔄 Обновить</button>
+          <button class="btn btn--outline" id="btnRefreshBookings" style="padding:8px 18px;font-size:0.85rem;">🔄 Оновити</button>
         </div>
 
         <div class="admin-table-wrap" id="adminBookingsWrap">
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Код / Гость</th>
+                <th>Код / Гість</th>
                 <th>Телефон</th>
-                <th>Дата и Время</th>
+                <th>Дата та Час</th>
                 <th>Гостей</th>
-                <th>Зал / Стол</th>
-                <th>Пожелания</th>
+                <th>Зал / Стіл</th>
+                <th>Побажання</th>
                 <th>Статус</th>
-                <th>Действия</th>
+                <th>Дії</th>
               </tr>
             </thead>
             <tbody id="adminBookingsBody"></tbody>
@@ -132,19 +132,19 @@
         </div>
         <div class="bookings-empty" id="adminBookingsEmpty" hidden>
           <div class="bookings-empty__icon">🍽️</div>
-          <p>Бронирований в этой категории пока нет</p>
+          <p>Бронювань у цій категорії поки немає</p>
         </div>
       </div>
 
       <!-- TAB 2: TABLES -->
       <div class="admin-tab-content" id="tabContentTables" hidden>
         <div class="admin-toolbar">
-          <p style="color:var(--color-text-muted);font-size:0.95rem;">Нажмите на статус столика для быстрого изменения</p>
+          <p style="color:var(--color-text-muted);font-size:0.95rem;">Натисніть на статус столика для швидкої зміни</p>
           <div class="admin-filter-group" id="hallFilterGroup">
-            <button class="filter-btn filter-btn--active" data-hall="all">Все залы</button>
-            <button class="filter-btn" data-hall="Основной зал">Основной зал</button>
+            <button class="filter-btn filter-btn--active" data-hall="all">Всі зали</button>
+            <button class="filter-btn" data-hall="Основной зал">Основний зал</button>
             <button class="filter-btn" data-hall="VIP-зона">VIP-зона</button>
-            <button class="filter-btn" data-hall="Терраса">Терраса</button>
+            <button class="filter-btn" data-hall="Терраса">Тераса</button>
           </div>
         </div>
         <div class="admin-tables-grid" id="adminTablesGrid"></div>
@@ -153,20 +153,20 @@
       <!-- TAB 3: STAFF -->
       <div class="admin-tab-content" id="tabContentStaff" hidden>
         <div class="admin-toolbar">
-          <p style="color:var(--color-text-muted);font-size:0.95rem;">Управление сменами и сотрудниками ресторана</p>
-          <button class="btn btn--primary" id="btnOpenAddStaffModal" style="padding:10px 22px;font-size:0.9rem;">+ Добавить сотрудника</button>
+          <p style="color:var(--color-text-muted);font-size:0.95rem;">Керування змінами та співробітниками ресторану</p>
+          <button class="btn btn--primary" id="btnOpenAddStaffModal" style="padding:10px 22px;font-size:0.9rem;">+ Додати співробітника</button>
         </div>
 
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Сотрудник</th>
-                <th>Должность</th>
+                <th>Співробітник</th>
+                <th>Посада</th>
                 <th>Телефон</th>
-                <th>Смена</th>
-                <th>Примечание</th>
-                <th>Действия</th>
+                <th>Зміна</th>
+                <th>Примітка</th>
+                <th>Дії</th>
               </tr>
             </thead>
             <tbody id="adminStaffBody"></tbody>
@@ -177,7 +177,7 @@
       <!-- TAB 4: STOP LIST -->
       <div class="admin-tab-content" id="tabContentStoplist" hidden>
         <div class="admin-toolbar">
-          <p style="color:var(--color-text-muted);font-size:0.95rem;">Управление доступностью блюд и напитков в меню</p>
+          <p style="color:var(--color-text-muted);font-size:0.95rem;">Керування доступністю страв та напоїв у меню</p>
         </div>
         <div class="admin-stoplist-grid" id="adminStoplistGrid"></div>
       </div>
@@ -185,16 +185,16 @@
       <!-- TAB 5: USERS -->
       <div class="admin-tab-content" id="tabContentUsers" hidden>
         <div class="section-header" style="margin-bottom:24px;">
-          <p style="color:var(--color-text-muted);">Зарегистрированные пользователи через Google</p>
+          <p style="color:var(--color-text-muted);">Зареєстровані користувачі через Google</p>
         </div>
         <div class="admin-table-wrap" id="adminTableWrap">
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Пользователь</th>
+                <th>Користувач</th>
                 <th>Email</th>
                 <th>Через</th>
-                <th>Регистрация</th>
+                <th>Реєстрація</th>
               </tr>
             </thead>
             <tbody id="adminTableBody"></tbody>
@@ -202,7 +202,7 @@
         </div>
         <div class="bookings-empty" id="adminEmpty" hidden>
           <div class="bookings-empty__icon">👤</div>
-          <p>Пользователей пока нет</p>
+          <p>Користувачів поки немає</p>
         </div>
       </div>
 
@@ -212,24 +212,24 @@
     <div class="modal" id="addStaffModal" hidden>
       <div class="modal__backdrop" id="closeStaffModalBg"></div>
       <div class="modal__card auth-card">
-        <div class="auth-card__logo gold-gradient" style="font-size:1.5rem;margin-bottom:8px;">Новый сотрудник</div>
-        <p class="auth-card__subtitle" style="margin-bottom:24px;">Добавление члена команды ресторана</p>
+        <div class="auth-card__logo gold-gradient" style="font-size:1.5rem;margin-bottom:8px;">Новий співробітник</div>
+        <p class="auth-card__subtitle" style="margin-bottom:24px;">Додавання члена команди ресторану</p>
         <form id="addStaffForm" style="display:flex;flex-direction:column;gap:16px;text-align:left;">
           <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">ФИО</label>
-            <input type="text" id="staffName" placeholder="Иван Иванов" required style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
+            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">ПІБ</label>
+            <input type="text" id="staffName" placeholder="Іван Іваненко" required style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
           </div>
           <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Должность</label>
+            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Посада</label>
             <select id="staffRole" required style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
-              <option value="Шеф-повар">Шеф-повар</option>
+              <option value="Шеф-кухар">Шеф-кухар</option>
               <option value="Су-шеф">Су-шеф</option>
-              <option value="Старший официант">Старший официант</option>
-              <option value="Официант">Официант</option>
-              <option value="Официант VIP">Официант VIP</option>
+              <option value="Старший офіціант">Старший офіціант</option>
+              <option value="Офіціант">Офіціант</option>
+              <option value="Офіціант VIP">Офіціант VIP</option>
               <option value="Хостес">Хостес</option>
-              <option value="Сомелье / Бармен">Сомелье / Бармен</option>
-              <option value="Администратор">Администратор</option>
+              <option value="Сомельє / Бармен">Сомельє / Бармен</option>
+              <option value="Адміністратор">Адміністратор</option>
             </select>
           </div>
           <div>
@@ -237,19 +237,19 @@
             <input type="tel" id="staffPhone" placeholder="+380 (__) ___-__-__" style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
           </div>
           <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Смена сейчас</label>
+            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Зміна зараз</label>
             <select id="staffShift" style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
-              <option value="on">🟢 На смене</option>
-              <option value="off" selected>⚪ Выходной</option>
+              <option value="on">🟢 На зміні</option>
+              <option value="off" selected>⚪ Вихідний</option>
             </select>
           </div>
           <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Примечание</label>
-            <input type="text" id="staffNotes" placeholder="Например: Основной зал" style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
+            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Примітка</label>
+            <input type="text" id="staffNotes" placeholder="Наприклад: Основний зал" style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
           </div>
           <div style="display:flex;gap:12px;margin-top:8px;">
-            <button type="button" class="btn btn--outline" id="btnCancelStaff" style="flex:1;">Отмена</button>
-            <button type="submit" class="btn btn--primary" style="flex:1;">Сохранить</button>
+            <button type="button" class="btn btn--outline" id="btnCancelStaff" style="flex:1;">Скасувати</button>
+            <button type="submit" class="btn btn--primary" style="flex:1;">Зберегти</button>
           </div>
         </form>
       </div>
@@ -263,34 +263,34 @@
     <div class="footer__grid">
       <div>
         <div class="footer__logo gold-gradient">LUXE</div>
-        <p class="footer__desc">Ресторан высокой кухни в самом сердце Киева.</p>
+        <p class="footer__desc">Ресторан високої кухні в самому серці Києва.</p>
       </div>
       <div>
-        <div class="footer__heading">Навигация</div>
+        <div class="footer__heading">Навігація</div>
         <div class="footer__links">
-          <a href="index.html">Главная</a>
+          <a href="index.html">Головна</a>
           <a href="menu.html">Меню</a>
-          <a href="booking.html">Бронирование</a>
-          <a href="about.html">О нас</a>
+          <a href="booking.html">Бронювання</a>
+          <a href="about.html">Про нас</a>
         </div>
       </div>
       <div>
-        <div class="footer__heading">Контакты</div>
+        <div class="footer__heading">Контакти</div>
         <div class="footer__links">
-          <a href="contacts.html">Адрес и карта</a>
+          <a href="contacts.html">Адреса та карта</a>
           <a href="tel:+380441234567">+380 (44) 123-45-67</a>
         </div>
       </div>
       <div>
-        <div class="footer__heading">Часы работы</div>
+        <div class="footer__heading">Години роботи</div>
         <div class="footer__links">
           <span>Пн–Чт: 12:00 – 23:00</span>
           <span>Пт–Сб: 12:00 – 01:00</span>
-          <span>Вс: 12:00 – 22:00</span>
+          <span>Нд: 12:00 – 22:00</span>
         </div>
       </div>
     </div>
-    <div class="footer__bottom">© 2025 LUXE Restaurant. Все права защищены.</div>
+    <div class="footer__bottom">© 2025 LUXE Restaurant. Всі права захищені.</div>
   </div>
 </footer>
 

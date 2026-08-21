@@ -173,11 +173,11 @@ function initAdminPage() {
       const password = document.getElementById('adminPassword').value
       const errorEl = document.getElementById('adminLoginError')
       const submitBtn = form.querySelector('button[type="submit"]')
-      const originalText = submitBtn ? submitBtn.textContent : 'Войти'
+      const originalText = submitBtn ? submitBtn.textContent : 'Увійти'
 
       if (submitBtn) {
         submitBtn.disabled = true
-        submitBtn.textContent = 'Вход...'
+        submitBtn.textContent = 'Вхід...'
       }
       if (errorEl) errorEl.style.display = 'none'
 
@@ -193,14 +193,14 @@ function initAdminPage() {
             showAdminPanel()
           } else {
             if (errorEl) {
-              errorEl.textContent = data.error || 'Неверный логин или пароль'
+              errorEl.textContent = data.error || 'Невірний логін або пароль'
               errorEl.style.display = 'block'
             }
           }
         })
         .catch(() => {
           if (errorEl) {
-            errorEl.textContent = 'Нет связи с сервером. Попробуйте позже.'
+            errorEl.textContent = 'Немає зв’язку із сервером. Спробуйте пізніше.'
             errorEl.style.display = 'block'
           }
         })
@@ -351,23 +351,23 @@ function loadAdminBookings(statusFilter = 'all') {
       if (empty) empty.hidden = true
 
       tbody.innerHTML = data.bookings.map(b => {
-        const dateStr = new Date(b.booking_date).toLocaleDateString('ru-RU')
+        const dateStr = new Date(b.booking_date).toLocaleDateString('uk-UA')
         const statusMap = {
-          pending: '<span class="status-badge status-badge--pending">⏳ Ожидает</span>',
-          confirmed: '<span class="status-badge status-badge--confirmed">✅ Подтверждена</span>',
+          pending: '<span class="status-badge status-badge--pending">⏳ Очікує</span>',
+          confirmed: '<span class="status-badge status-badge--confirmed">✅ Підтверджена</span>',
           completed: '<span class="status-badge status-badge--completed">🏁 Завершена</span>',
-          cancelled: '<span class="status-badge status-badge--cancelled">❌ Отклонена</span>'
+          cancelled: '<span class="status-badge status-badge--cancelled">❌ Відхилена</span>'
         }
 
         const tgBadge = b.is_phone_verified
           ? `<div class="tg-verified-tag">✓ Telegram Verified</div>`
           : ''
 
-        const tableText = b.table_num ? `Стол #${b.table_num}` : '—'
+        const tableText = b.table_num ? `Стіл #${b.table_num}` : '—'
 
         return `<tr>
           <td>
-            <strong>${b.guest_name || 'Гость'}</strong>
+            <strong>${b.guest_name || 'Гість'}</strong>
             <div style="font-size:0.75rem;color:var(--color-gold);letter-spacing:1px;">${b.booking_code}</div>
           </td>
           <td>
@@ -375,15 +375,15 @@ function loadAdminBookings(statusFilter = 'all') {
             ${tgBadge}
           </td>
           <td>${dateStr} <br><span style="color:var(--color-gold);font-weight:600;">${b.booking_time}</span></td>
-          <td><strong>${b.guests_count}</strong> чел.</td>
+          <td><strong>${b.guests_count}</strong> чол.</td>
           <td>${b.hall} <br><small style="color:var(--color-text-muted);">${tableText}</small></td>
           <td style="max-width:180px;font-size:0.85rem;color:var(--color-text-muted);">${b.notes || '—'}</td>
           <td>${statusMap[b.status] || b.status}</td>
           <td>
             <div class="admin-actions">
-              ${b.status !== 'confirmed' ? `<button class="act-btn act-btn--confirm" onclick="updateBooking(${b.id}, 'confirmed')">✓ Подтвердить</button>` : ''}
-              ${b.status !== 'completed' ? `<button class="act-btn act-btn--done" onclick="updateBooking(${b.id}, 'completed')">🏁 Завершить</button>` : ''}
-              ${b.status !== 'cancelled' ? `<button class="act-btn act-btn--cancel" onclick="updateBooking(${b.id}, 'cancelled')">✕ Отклонить</button>` : ''}
+              ${b.status !== 'confirmed' ? `<button class="act-btn act-btn--confirm" onclick="updateBooking(${b.id}, 'confirmed')">✓ Підтвердити</button>` : ''}
+              ${b.status !== 'completed' ? `<button class="act-btn act-btn--done" onclick="updateBooking(${b.id}, 'completed')">🏁 Завершити</button>` : ''}
+              ${b.status !== 'cancelled' ? `<button class="act-btn act-btn--cancel" onclick="updateBooking(${b.id}, 'cancelled')">✕ Відхилити</button>` : ''}
               <button class="act-btn act-btn--delete" onclick="deleteBookingItem(${b.id})">🗑️</button>
             </div>
           </td>
@@ -409,7 +409,7 @@ window.updateBooking = function(id, status) {
 }
 
 window.deleteBookingItem = function(id) {
-  if (!confirm('Удалить эту запись бронирования?')) return
+  if (!confirm('Видалити цей запис бронювання?')) return
   fetch(`${API_URL}/api/admin/bookings/${id}`, {
     method: 'DELETE',
     credentials: 'include'
@@ -447,14 +447,14 @@ function loadAdminTables(hallFilter = 'all') {
       }
 
       const statusBtnLabels = {
-        free: '🟢 Свободен (клик для изменения)',
-        occupied: '🔴 Занят (клик для изменения)',
-        reserved: '🟡 Забронирован (клик для изменения)'
+        free: '🟢 Вільний (клік для зміни)',
+        occupied: '🔴 Зайнятий (клік для зміни)',
+        reserved: '🟡 Заброньований (клік для зміни)'
       }
 
       grid.innerHTML = list.map(t => {
         return `<div class="table-card table-card--${t.status}">
-          <div class="table-card__num">Стол #${t.number}</div>
+          <div class="table-card__num">Стіл #${t.number}</div>
           <div class="table-card__hall">${t.hall}</div>
           <div class="table-card__cap">👥 До ${t.capacity} персон</div>
           <button type="button" class="table-card__status-btn table-card__status-btn--${t.status}" onclick="cycleTableStatus(${t.id}, '${t.status}')">
@@ -499,8 +499,8 @@ function loadAdminStaff() {
       tbody.innerHTML = data.staff.map(s => {
         const isOnShift = s.shift_status === 'on'
         const shiftBtn = isOnShift
-          ? `<button class="act-btn act-btn--confirm" style="font-weight:600;" onclick="toggleStaffShift(${s.id}, 'off')">🟢 На смене</button>`
-          : `<button class="act-btn" style="color:var(--color-text-muted);" onclick="toggleStaffShift(${s.id}, 'on')">⚪ Выходной</button>`
+          ? `<button class="act-btn act-btn--confirm" style="font-weight:600;" onclick="toggleStaffShift(${s.id}, 'off')">🟢 На зміні</button>`
+          : `<button class="act-btn" style="color:var(--color-text-muted);" onclick="toggleStaffShift(${s.id}, 'on')">⚪ Вихідний</button>`
 
         return `<tr>
           <td><strong>${s.name}</strong></td>
@@ -509,7 +509,7 @@ function loadAdminStaff() {
           <td>${shiftBtn}</td>
           <td style="color:var(--color-text-muted);font-size:0.85rem;">${s.notes || '—'}</td>
           <td>
-            <button class="act-btn act-btn--delete" onclick="deleteStaffItem(${s.id})">🗑️ Удалить</button>
+            <button class="act-btn act-btn--delete" onclick="deleteStaffItem(${s.id})">🗑️ Видалити</button>
           </td>
         </tr>`
       }).join('')
@@ -532,7 +532,7 @@ window.toggleStaffShift = function(id, newStatus) {
 }
 
 window.deleteStaffItem = function(id) {
-  if (!confirm('Удалить сотрудника из штата?')) return
+  if (!confirm('Видалити співробітника зі штату?')) return
   fetch(`${API_URL}/api/admin/staff/${id}`, {
     method: 'DELETE',
     credentials: 'include'
@@ -591,7 +591,7 @@ function initStaffModal() {
             loadAdminStaff()
             loadAdminStats()
           } else {
-            alert(data.error || 'Ошибка добавления сотрудника')
+            alert(data.error || 'Помилка додавання співробітника')
           }
         })
     })
@@ -611,7 +611,7 @@ function loadAdminStopList() {
         return `<div class="stoplist-card ${item.is_stopped ? 'stoplist-card--stopped' : ''}">
           <div>
             <div class="stoplist-card__title">${item.item_name}</div>
-            <div class="stoplist-card__cat">${item.category} • <span style="color:${isAvailable ? '#81c784' : '#e57373'};">${isAvailable ? 'В наличии' : 'В стоп-листе'}</span></div>
+            <div class="stoplist-card__cat">${item.category} • <span style="color:${isAvailable ? '#81c784' : '#e57373'};">${isAvailable ? 'В наявності' : 'У стоп-листі'}</span></div>
           </div>
           <div>
             <label class="switch">
@@ -665,7 +665,7 @@ function loadAdminUsers() {
         const avatar = u.avatar
           ? `<img class="admin-avatar" src="${u.avatar}" alt="">`
           : `<span style="display:inline-block;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-gold),var(--color-gold-dark));color:var(--color-bg);font-weight:700;text-align:center;line-height:36px;">${(u.name || u.email || 'U')[0].toUpperCase()}</span>`
-        const created = new Date(u.created_at).toLocaleDateString('ru-RU')
+        const created = new Date(u.created_at).toLocaleDateString('uk-UA')
         return `<tr>
           <td>${avatar} ${u.name || '—'}</td>
           <td>${u.email}</td>
@@ -700,7 +700,7 @@ function initHeaderAuth() {
     })
     .then(data => {
       if (data && data.user) {
-        cta.textContent = 'Кабинет'
+        cta.textContent = 'Кабінет'
         cta.href = 'dashboard.html'
       }
     })
@@ -801,22 +801,22 @@ function initBookingForm() {
 
     const selectedTime = document.querySelector('.time-slot--active')
     if (!selectedTime) {
-      alert('Пожалуйста, выберите время')
+      alert('Будь ласка, оберіть час')
       return
     }
 
-    const guest_name = (document.getElementById('bookingName')?.value || '').trim() || 'Гость'
+    const guest_name = (document.getElementById('bookingName')?.value || '').trim() || 'Гість'
     const booking_date = dateInput.value
     const booking_time = selectedTime.textContent.trim()
     const guests_count = parseInt(document.getElementById('guestCount')?.textContent) || 2
     const phone = (document.getElementById('bookingPhone')?.value || '').trim()
     const activeHallCard = document.querySelector('.hall-card--active')
-    const hall = activeHallCard ? (activeHallCard.dataset.hall || activeHallCard.querySelector('.hall-card__name')?.textContent || 'Основной зал') : 'Основной зал'
+    const hall = activeHallCard ? (activeHallCard.dataset.hall || activeHallCard.querySelector('.hall-card__name')?.textContent || 'Основний зал') : 'Основний зал'
     const notes = (document.getElementById('bookingNotes')?.value || '').trim()
 
     const submitBtn = document.getElementById('bookingSubmit')
     if (submitBtn) {
-      submitBtn.textContent = 'Отправка...'
+      submitBtn.textContent = 'Відправка...'
       submitBtn.disabled = true
     }
 
@@ -836,9 +836,9 @@ function initBookingForm() {
       .then(res => res.json().then(data => ({ ok: res.ok, data })))
       .then(({ ok, data }) => {
         if (!ok || !data.booking) {
-          alert(data.error || 'Ошибка при отправке заявки')
+          alert(data.error || 'Помилка під час відправки заявки')
           if (submitBtn) {
-            submitBtn.textContent = 'Забронировать столик'
+            submitBtn.textContent = 'Забронювати столик'
             submitBtn.disabled = false
           }
           return
@@ -861,9 +861,9 @@ function initBookingForm() {
         }
       })
       .catch(() => {
-        alert('Нет связи с сервером. Попробуйте позже.')
+        alert('Немає зв’язку із сервером. Спробуйте пізніше.')
         if (submitBtn) {
-          submitBtn.textContent = 'Забронировать столик'
+          submitBtn.textContent = 'Забронювати столик'
           submitBtn.disabled = false
         }
       })
@@ -880,7 +880,7 @@ function initBookingForm() {
       document.querySelectorAll('.time-slot--active').forEach(el => el.classList.remove('time-slot--active'))
       const submitBtn = document.getElementById('bookingSubmit')
       if (submitBtn) {
-        submitBtn.textContent = 'Забронировать столик'
+        submitBtn.textContent = 'Забронювати столик'
         submitBtn.disabled = false
       }
     })
@@ -918,11 +918,11 @@ function showFinalBookingSuccess(booking) {
   }
 
   if (detailsEl) {
-    const dateStr = new Date(booking.booking_date).toLocaleDateString('ru-RU')
+    const dateStr = new Date(booking.booking_date).toLocaleDateString('uk-UA')
     detailsEl.innerHTML = `
-      Номер <strong>${booking.phone || ''}</strong> успешно подтверждён через Telegram! ✨<br>
-      📅 <strong>${dateStr}</strong> в <strong>${booking.booking_time}</strong> (${booking.hall})<br>
-      👥 Гостей: <strong>${booking.guests_count}</strong> | Код брони: <strong>${booking.booking_code}</strong>
+      Номер <strong>${booking.phone || ''}</strong> успішно підтверджено через Telegram! ✨<br>
+      📅 <strong>${dateStr}</strong> о <strong>${booking.booking_time}</strong> (${booking.hall})<br>
+      👥 Гостей: <strong>${booking.guests_count}</strong> | Код броні: <strong>${booking.booking_code}</strong>
     `
   }
 }
