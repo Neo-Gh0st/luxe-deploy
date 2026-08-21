@@ -164,6 +164,7 @@ function initAdminPage() {
     })
     .catch(() => showAdminLogin())
 
+  // Admin login form
   const form = document.getElementById('adminLoginForm')
   if (form) {
     form.addEventListener('submit', (e) => {
@@ -212,6 +213,7 @@ function initAdminPage() {
     })
   }
 
+  // Admin logout
   const logoutBtn = document.getElementById('adminLogoutBtn')
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
@@ -221,6 +223,12 @@ function initAdminPage() {
         })
     })
   }
+
+  // Tabs switching
+  initAdminTabs()
+  initStaffModal()
+  initBookingFilters()
+  initHallFilters()
 }
 
 function showAdminLogin() {
@@ -249,6 +257,389 @@ function showAdminPanel() {
     panelView.querySelectorAll('.animate-on-scroll').forEach(el => el.classList.add('animate-on-scroll--visible'))
   }
 
+  loadAdminStats()
+  loadAdminBookings('all')
+  loadAdminTables('all')
+  loadAdminStaff()
+  loadAdminStopList()
+  loadAdminUsers()
+}
+
+/* ---- Admin: Stats ---- */
+function loadAdminStats() {
+  fetch(`${API_URL}/api/admin/stats`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.ok || !data.stats) return
+      const s = data.stats
+      const bEl = document.getElementById('statTodayBookings')
+      const gEl = document.getElementById('statTodayGuests')
+      const tEl = document.getElementById('statTablesOccupied')
+      const stEl = document.getElementById('statStaffOnShift')
+
+      if (bEl) bEl.textContent = s.today_bookings
+      if (gEl) gEl.textContent = s.today_guests
+      if (tEl) tEl.textContent = `${s.occupied_tables} / ${s.total_tables}`
+      if (stEl) stEl.textContent = `${s.staff_on_shift} / ${s.total_staff}`
+    })
+    .catch(() => {})
+}
+
+/* ---- Admin: Tabs ---- */
+function initAdminTabs() {
+  const tabBtns = document.querySelectorAll('.admin-tab-btn')
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('admin-tab-btn--active'))
+      btn.classList.add('admin-tab-btn--active')
+
+      const tab = btn.dataset.tab
+      const allTabs = ['Bookings', 'Tables', 'Staff', 'Stoplist', 'Users']
+      allTabs.forEach(t => {
+        const content = document.getElementById(`tabContent${t}`)
+        if (!content) return
+        if (t.toLowerCase() === tab.toLowerCase()) {
+          content.hidden = false
+          content.style.display = 'block'
+        } else {
+          content.hidden = true
+          content.style.display = 'none'
+        }
+      })
+    })
+  })
+}
+
+/* ---- Admin: Bookings ---- */
+function initBookingFilters() {
+  const filterBtns = document.querySelectorAll('#bookingFilterGroup .filter-btn')
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('filter-btn--active'))
+      btn.classList.add('filter-btn--active')
+      loadAdminBookings(btn.dataset.filter)
+    })
+  })
+
+  const refreshBtn = document.getElementById('btnRefreshBookings')
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      const activeBtn = document.querySelector('#bookingFilterGroup .filter-btn--active')
+      const filter = activeBtn ? activeBtn.dataset.filter : 'all'
+      loadAdminBookings(filter)
+      loadAdminStats()
+    })
+  }
+}
+
+function loadAdminBookings(statusFilter = 'all') {
+  fetch(`${API_URL}/api/admin/bookings?status=${statusFilter}`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      const wrap = document.getElementById('adminBookingsWrap')
+      const empty = document.getElementById('adminBookingsEmpty')
+      const tbody = document.getElementById('adminBookingsBody')
+      if (!tbody) return
+
+      if (!data.bookings || !data.bookings.length) {
+        if (wrap) wrap.hidden = true
+        if (empty) empty.hidden = false
+        return
+      }
+
+      if (wrap) wrap.hidden = false
+      if (empty) empty.hidden = true
+
+      tbody.innerHTML = data.bookings.map(b => {
+        const dateStr = new Date(b.booking_date).toLocaleDateString('ru-RU')
+        const statusMap = {
+          pending: '<span class="status-badge status-badge--pending">⏳ Ожидает</span>',
+          confirmed: '<span class="status-badge status-badge--confirmed">✅ Подтверждена</span>',
+          completed: '<span class="status-badge status-badge--completed">🏁 Завершена</span>',
+          cancelled: '<span class="status-badge status-badge--cancelled">❌ Отклонена</span>'
+        }
+
+        const tgBadge = b.is_phone_verified
+          ? `<div class="tg-verified-tag">✓ Telegram Verified</div>`
+          : ''
+
+        const tableText = b.table_num ? `Стол #${b.table_num}` : '—'
+
+        return `<tr>
+          <td>
+            <strong>${b.guest_name || 'Гость'}</strong>
+            <div style="font-size:0.75rem;color:var(--color-gold);letter-spacing:1px;">${b.booking_code}</div>
+          </td>
+          <td>
+            <div>${b.phone || '—'}</div>
+            ${tgBadge}
+          </td>
+          <td>${dateStr} <br><span style="color:var(--color-gold);font-weight:600;">${b.booking_time}</span></td>
+          <td><strong>${b.guests_count}</strong> чел.</td>
+          <td>${b.hall} <br><small style="color:var(--color-text-muted);">${tableText}</small></td>
+          <td style="max-width:180px;font-size:0.85rem;color:var(--color-text-muted);">${b.notes || '—'}</td>
+          <td>${statusMap[b.status] || b.status}</td>
+          <td>
+            <div class="admin-actions">
+              ${b.status !== 'confirmed' ? `<button class="act-btn act-btn--confirm" onclick="updateBooking(${b.id}, 'confirmed')">✓ Подтвердить</button>` : ''}
+              ${b.status !== 'completed' ? `<button class="act-btn act-btn--done" onclick="updateBooking(${b.id}, 'completed')">🏁 Завершить</button>` : ''}
+              ${b.status !== 'cancelled' ? `<button class="act-btn act-btn--cancel" onclick="updateBooking(${b.id}, 'cancelled')">✕ Отклонить</button>` : ''}
+              <button class="act-btn act-btn--delete" onclick="deleteBookingItem(${b.id})">🗑️</button>
+            </div>
+          </td>
+        </tr>`
+      }).join('')
+    })
+    .catch(() => {})
+}
+
+window.updateBooking = function(id, status) {
+  fetch(`${API_URL}/api/admin/bookings/${id}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  })
+    .then(res => res.json())
+    .then(() => {
+      const activeBtn = document.querySelector('#bookingFilterGroup .filter-btn--active')
+      loadAdminBookings(activeBtn ? activeBtn.dataset.filter : 'all')
+      loadAdminStats()
+    })
+}
+
+window.deleteBookingItem = function(id) {
+  if (!confirm('Удалить эту запись бронирования?')) return
+  fetch(`${API_URL}/api/admin/bookings/${id}`, {
+    method: 'DELETE',
+    credentials: 'include'
+  })
+    .then(res => res.json())
+    .then(() => {
+      const activeBtn = document.querySelector('#bookingFilterGroup .filter-btn--active')
+      loadAdminBookings(activeBtn ? activeBtn.dataset.filter : 'all')
+      loadAdminStats()
+    })
+}
+
+/* ---- Admin: Tables ---- */
+function initHallFilters() {
+  const hallBtns = document.querySelectorAll('#hallFilterGroup .filter-btn')
+  hallBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      hallBtns.forEach(b => b.classList.remove('filter-btn--active'))
+      btn.classList.add('filter-btn--active')
+      loadAdminTables(btn.dataset.hall)
+    })
+  })
+}
+
+function loadAdminTables(hallFilter = 'all') {
+  fetch(`${API_URL}/api/admin/tables`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      const grid = document.getElementById('adminTablesGrid')
+      if (!grid || !data.tables) return
+
+      let list = data.tables
+      if (hallFilter && hallFilter !== 'all') {
+        list = list.filter(t => t.hall === hallFilter)
+      }
+
+      const statusBtnLabels = {
+        free: '🟢 Свободен (клик для изменения)',
+        occupied: '🔴 Занят (клик для изменения)',
+        reserved: '🟡 Забронирован (клик для изменения)'
+      }
+
+      grid.innerHTML = list.map(t => {
+        return `<div class="table-card table-card--${t.status}">
+          <div class="table-card__num">Стол #${t.number}</div>
+          <div class="table-card__hall">${t.hall}</div>
+          <div class="table-card__cap">👥 До ${t.capacity} персон</div>
+          <button type="button" class="table-card__status-btn table-card__status-btn--${t.status}" onclick="cycleTableStatus(${t.id}, '${t.status}')">
+            ${statusBtnLabels[t.status] || t.status}
+          </button>
+        </div>`
+      }).join('')
+    })
+    .catch(() => {})
+}
+
+window.cycleTableStatus = function(id, currentStatus) {
+  const nextStatusMap = {
+    free: 'occupied',
+    occupied: 'reserved',
+    reserved: 'free'
+  }
+  const nextStatus = nextStatusMap[currentStatus] || 'free'
+
+  fetch(`${API_URL}/api/admin/tables/${id}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: nextStatus })
+  })
+    .then(res => res.json())
+    .then(() => {
+      const activeBtn = document.querySelector('#hallFilterGroup .filter-btn--active')
+      loadAdminTables(activeBtn ? activeBtn.dataset.hall : 'all')
+      loadAdminStats()
+    })
+}
+
+/* ---- Admin: Staff ---- */
+function loadAdminStaff() {
+  fetch(`${API_URL}/api/admin/staff`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById('adminStaffBody')
+      if (!tbody || !data.staff) return
+
+      tbody.innerHTML = data.staff.map(s => {
+        const isOnShift = s.shift_status === 'on'
+        const shiftBtn = isOnShift
+          ? `<button class="act-btn act-btn--confirm" style="font-weight:600;" onclick="toggleStaffShift(${s.id}, 'off')">🟢 На смене</button>`
+          : `<button class="act-btn" style="color:var(--color-text-muted);" onclick="toggleStaffShift(${s.id}, 'on')">⚪ Выходной</button>`
+
+        return `<tr>
+          <td><strong>${s.name}</strong></td>
+          <td><span class="admin-badge admin-badge--admin" style="font-size:0.75rem;">${s.role}</span></td>
+          <td>${s.phone || '—'}</td>
+          <td>${shiftBtn}</td>
+          <td style="color:var(--color-text-muted);font-size:0.85rem;">${s.notes || '—'}</td>
+          <td>
+            <button class="act-btn act-btn--delete" onclick="deleteStaffItem(${s.id})">🗑️ Удалить</button>
+          </td>
+        </tr>`
+      }).join('')
+    })
+    .catch(() => {})
+}
+
+window.toggleStaffShift = function(id, newStatus) {
+  fetch(`${API_URL}/api/admin/staff/${id}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ shift_status: newStatus })
+  })
+    .then(res => res.json())
+    .then(() => {
+      loadAdminStaff()
+      loadAdminStats()
+    })
+}
+
+window.deleteStaffItem = function(id) {
+  if (!confirm('Удалить сотрудника из штата?')) return
+  fetch(`${API_URL}/api/admin/staff/${id}`, {
+    method: 'DELETE',
+    credentials: 'include'
+  })
+    .then(res => res.json())
+    .then(() => {
+      loadAdminStaff()
+      loadAdminStats()
+    })
+}
+
+function initStaffModal() {
+  const modal = document.getElementById('addStaffModal')
+  const openBtn = document.getElementById('btnOpenAddStaffModal')
+  const cancelBtn = document.getElementById('btnCancelStaff')
+  const closeBg = document.getElementById('closeStaffModalBg')
+  const form = document.getElementById('addStaffForm')
+
+  if (!modal) return
+
+  const closeModal = () => {
+    modal.hidden = true
+    modal.style.display = 'none'
+  }
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      modal.hidden = false
+      modal.style.display = 'flex'
+    })
+  }
+
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal)
+  if (closeBg) closeBg.addEventListener('click', closeModal)
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const name = document.getElementById('staffName').value.trim()
+      const role = document.getElementById('staffRole').value
+      const phone = document.getElementById('staffPhone').value.trim()
+      const shift_status = document.getElementById('staffShift').value
+      const notes = document.getElementById('staffNotes').value.trim()
+
+      fetch(`${API_URL}/api/admin/staff`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, role, phone, shift_status, notes })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.ok) {
+            form.reset()
+            closeModal()
+            loadAdminStaff()
+            loadAdminStats()
+          } else {
+            alert(data.error || 'Ошибка добавления сотрудника')
+          }
+        })
+    })
+  }
+}
+
+/* ---- Admin: Stop List ---- */
+function loadAdminStopList() {
+  fetch(`${API_URL}/api/admin/stop-list`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      const grid = document.getElementById('adminStoplistGrid')
+      if (!grid || !data.items) return
+
+      grid.innerHTML = data.items.map(item => {
+        const isAvailable = !item.is_stopped
+        return `<div class="stoplist-card ${item.is_stopped ? 'stoplist-card--stopped' : ''}">
+          <div>
+            <div class="stoplist-card__title">${item.item_name}</div>
+            <div class="stoplist-card__cat">${item.category} • <span style="color:${isAvailable ? '#81c784' : '#e57373'};">${isAvailable ? 'В наличии' : 'В стоп-листе'}</span></div>
+          </div>
+          <div>
+            <label class="switch">
+              <input type="checkbox" ${isAvailable ? 'checked' : ''} onchange="toggleStopItem(${item.id}, !this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>`
+      }).join('')
+    })
+    .catch(() => {})
+}
+
+window.toggleStopItem = function(id, is_stopped) {
+  fetch(`${API_URL}/api/admin/stop-list/${id}`, {
+    method: 'PATCH',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ is_stopped })
+  })
+    .then(res => res.json())
+    .then(() => {
+      loadAdminStopList()
+    })
+}
+
+/* ---- Admin: Users ---- */
+function loadAdminUsers() {
   fetch(`${API_URL}/api/admin/users`, { credentials: 'include' })
     .then(res => {
       if (!res.ok) throw new Error('Unauthorized')
@@ -378,11 +769,14 @@ function initMenuFilters() {
   })
 }
 
-/* ---- Booking Form ---- */
+/* ---- Booking Form with Telegram Verification ---- */
+let bookingPollTimer = null
+
 function initBookingForm() {
   const form = document.getElementById('bookingForm')
   const dateInput = document.getElementById('bookingDate')
   const timeGroup = document.getElementById('timeSlotsGroup')
+  const telegramStep = document.getElementById('bookingTelegramStep')
   const successEl = document.getElementById('bookingSuccess')
   const resetBtn = document.getElementById('bookingReset')
 
@@ -411,30 +805,125 @@ function initBookingForm() {
       return
     }
 
-    const submitBtn = document.getElementById('bookingSubmit')
-    submitBtn.textContent = 'Отправка...'
-    submitBtn.disabled = true
+    const guest_name = (document.getElementById('bookingName')?.value || '').trim() || 'Гость'
+    const booking_date = dateInput.value
+    const booking_time = selectedTime.textContent.trim()
+    const guests_count = parseInt(document.getElementById('guestCount')?.textContent) || 2
+    const phone = (document.getElementById('bookingPhone')?.value || '').trim()
+    const activeHallCard = document.querySelector('.hall-card--active')
+    const hall = activeHallCard ? (activeHallCard.dataset.hall || activeHallCard.querySelector('.hall-card__name')?.textContent || 'Основной зал') : 'Основной зал'
+    const notes = (document.getElementById('bookingNotes')?.value || '').trim()
 
-    setTimeout(() => {
-      form.style.display = 'none'
-      successEl.style.display = ''
-      successEl.style.animation = 'slideUp 0.5s ease forwards'
-    }, 1200)
+    const submitBtn = document.getElementById('bookingSubmit')
+    if (submitBtn) {
+      submitBtn.textContent = 'Отправка...'
+      submitBtn.disabled = true
+    }
+
+    fetch(`${API_URL}/api/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        guest_name,
+        booking_date,
+        booking_time,
+        guests_count,
+        phone,
+        hall,
+        notes
+      })
+    })
+      .then(res => res.json().then(data => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok || !data.booking) {
+          alert(data.error || 'Ошибка при отправке заявки')
+          if (submitBtn) {
+            submitBtn.textContent = 'Забронировать столик'
+            submitBtn.disabled = false
+          }
+          return
+        }
+
+        const b = data.booking
+        form.style.display = 'none'
+
+        if (telegramStep) {
+          telegramStep.style.display = 'block'
+          telegramStep.style.animation = 'slideUp 0.5s ease forwards'
+
+          const codeDisplay = document.getElementById('bookingCodeDisplay')
+          if (codeDisplay) codeDisplay.textContent = b.booking_code
+
+          const tgBtn = document.getElementById('bookingTelegramBtn')
+          if (tgBtn && data.telegramUrl) tgBtn.href = data.telegramUrl
+
+          startBookingStatusPolling(b.booking_code, b)
+        }
+      })
+      .catch(() => {
+        alert('Нет связи с сервером. Попробуйте позже.')
+        if (submitBtn) {
+          submitBtn.textContent = 'Забронировать столик'
+          submitBtn.disabled = false
+        }
+      })
   })
 
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
+      if (bookingPollTimer) clearInterval(bookingPollTimer)
       form.reset()
       form.style.display = ''
-      successEl.style.display = 'none'
+      if (telegramStep) telegramStep.style.display = 'none'
+      if (successEl) successEl.style.display = 'none'
       timeGroup.style.display = 'none'
       document.querySelectorAll('.time-slot--active').forEach(el => el.classList.remove('time-slot--active'))
       const submitBtn = document.getElementById('bookingSubmit')
       if (submitBtn) {
-        submitBtn.textContent = 'Отправить заявку'
+        submitBtn.textContent = 'Забронировать столик'
         submitBtn.disabled = false
       }
     })
+  }
+}
+
+function startBookingStatusPolling(bookingCode, initialBooking) {
+  if (bookingPollTimer) clearInterval(bookingPollTimer)
+
+  bookingPollTimer = setInterval(() => {
+    fetch(`${API_URL}/api/bookings/${bookingCode}/status`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok && data.booking) {
+          const b = data.booking
+          if (b.is_phone_verified || b.status === 'confirmed') {
+            clearInterval(bookingPollTimer)
+            showFinalBookingSuccess(b)
+          }
+        }
+      })
+      .catch(() => {})
+  }, 2500)
+}
+
+function showFinalBookingSuccess(booking) {
+  const telegramStep = document.getElementById('bookingTelegramStep')
+  const successEl = document.getElementById('bookingSuccess')
+  const detailsEl = document.getElementById('bookingSuccessDetails')
+
+  if (telegramStep) telegramStep.style.display = 'none'
+  if (successEl) {
+    successEl.style.display = 'block'
+    successEl.style.animation = 'slideUp 0.5s ease forwards'
+  }
+
+  if (detailsEl) {
+    const dateStr = new Date(booking.booking_date).toLocaleDateString('ru-RU')
+    detailsEl.innerHTML = `
+      Номер <strong>${booking.phone || ''}</strong> успешно подтверждён через Telegram! ✨<br>
+      📅 <strong>${dateStr}</strong> в <strong>${booking.booking_time}</strong> (${booking.hall})<br>
+      👥 Гостей: <strong>${booking.guests_count}</strong> | Код брони: <strong>${booking.booking_code}</strong>
+    `
   }
 }
 
@@ -486,11 +975,5 @@ function initTimeSlots() {
       slots.forEach(s => s.classList.remove('time-slot--active'))
       slot.classList.add('time-slot--active')
     })
-  })
-
-  slots.forEach(slot => {
-    if (Math.random() < 0.3) {
-      slot.classList.add('time-slot--disabled')
-    }
   })
 }

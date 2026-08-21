@@ -46,12 +46,12 @@
     <form class="booking-form animate-on-scroll" id="bookingForm">
       <div class="form-row">
         <div class="form-group">
-          <label>Дата</label>
-          <input type="date" id="bookingDate" required>
+          <label>Ваше имя</label>
+          <input type="text" id="bookingName" placeholder="Александр" required>
         </div>
         <div class="form-group">
-          <label>Телефон</label>
-          <input type="tel" placeholder="+380 (__) ___-__-__" required>
+          <label>Дата</label>
+          <input type="date" id="bookingDate" required>
         </div>
       </div>
 
@@ -77,29 +77,35 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Гости</label>
-        <div class="guest-counter">
-          <button type="button" id="guestMinus">−</button>
-          <span id="guestCount">2</span>
-          <button type="button" id="guestPlus">+</button>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Гости</label>
+          <div class="guest-counter">
+            <button type="button" id="guestMinus">−</button>
+            <span id="guestCount">2</span>
+            <button type="button" id="guestPlus">+</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Телефон для связи (или через Telegram)</label>
+          <input type="tel" id="bookingPhone" placeholder="+380 (__) ___-__-__">
         </div>
       </div>
 
       <div class="form-group">
         <label>Зал</label>
         <div class="halls">
-          <button type="button" class="hall-card">
+          <button type="button" class="hall-card hall-card--active" data-hall="Основной зал">
             <div class="hall-card__icon">🍽️</div>
             <div class="hall-card__name">Основной зал</div>
             <div class="hall-card__desc">Элегантная атмосфера</div>
           </button>
-          <button type="button" class="hall-card">
-            <div class="hall-card__icon"> VIP</div>
+          <button type="button" class="hall-card" data-hall="VIP-зона">
+            <div class="hall-card__icon">👑</div>
             <div class="hall-card__name">VIP-зона</div>
             <div class="hall-card__desc">Приватность и комфорт</div>
           </button>
-          <button type="button" class="hall-card">
+          <button type="button" class="hall-card" data-hall="Терраса">
             <div class="hall-card__icon">🌸</div>
             <div class="hall-card__name">Терраса</div>
             <div class="hall-card__desc">Открытая зона</div>
@@ -109,17 +115,41 @@
 
       <div class="form-group">
         <label>Пожелания</label>
-        <textarea placeholder="Особые пожелания к бронированию..."></textarea>
+        <textarea id="bookingNotes" placeholder="Особые пожелания к бронированию (столик у окна, повод и т.д.)..."></textarea>
       </div>
 
-      <button type="submit" class="btn btn--primary" id="bookingSubmit" style="width:100%;">Отправить заявку</button>
+      <button type="submit" class="btn btn--primary" id="bookingSubmit" style="width:100%;">Забронировать столик</button>
     </form>
 
+    <!-- Telegram Verification Card -->
+    <div class="success-state" id="bookingTelegramStep" style="display:none;">
+      <div class="success-state__icon" style="font-size:3rem;">📱</div>
+      <h3>Подтверждение в Telegram</h3>
+      <p style="max-width:520px;margin:0 auto 20px;line-height:1.6;">
+        Для подтверждения столика и верификации номера перейдите в нашего Telegram-бота <strong>@LUXE_Restaurant_bot</strong> и нажмите кнопку «Поделиться контактом».
+      </p>
+      <div style="margin-bottom:24px;">
+        <span class="admin-badge admin-badge--admin" id="bookingCodeDisplay" style="font-size:1.1rem;padding:8px 20px;letter-spacing:2px;">LUXE-....</span>
+      </div>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+        <a href="#" target="_blank" class="btn btn--primary" id="bookingTelegramBtn" style="background:#229ED9;border-color:#229ED9;display:inline-flex;align-items:center;gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .39z"/></svg>
+          Открыть @LUXE_Restaurant_bot
+        </a>
+      </div>
+      <div style="margin-top:20px;font-size:0.9rem;color:var(--color-text-muted);" id="bookingPollingStatus">
+        ⏳ Ожидаем подтверждения в боте...
+      </div>
+    </div>
+
+    <!-- Final Success State -->
     <div class="success-state" id="bookingSuccess" style="display:none;">
-      <div class="success-state__icon">✅</div>
-      <h3>Заявка отправлена!</h3>
-      <p>Мы свяжемся с вами для подтверждения бронирования в ближайшее время.</p>
-      <button class="btn btn--outline" id="bookingReset">Новое бронирование</button>
+      <div class="success-state__icon">✨</div>
+      <h3 class="gold-gradient" style="font-size:2rem;margin-bottom:12px;">Столик забронирован!</h3>
+      <p style="max-width:480px;margin:0 auto 24px;line-height:1.6;" id="bookingSuccessDetails">
+        Ваше бронирование успешно подтверждено. Ждём вас в ресторане LUXE!
+      </p>
+      <button class="btn btn--outline" id="bookingReset">Забронировать ещё столик</button>
     </div>
   </div>
 </section>
