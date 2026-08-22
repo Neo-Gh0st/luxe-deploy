@@ -157,10 +157,29 @@ function initAdminPage() {
   const panelView = document.getElementById('adminPanelView')
   if (!loginView || !panelView) return
 
+  const dateEl = document.getElementById('adminTodayDate')
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('uk-UA', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    })
+  }
+
+  const setAdminIdentity = (username) => {
+    if (!username) return
+    const nameEl = document.getElementById('adminName')
+    if (nameEl) nameEl.textContent = username
+    const avatarEl = document.getElementById('adminAvatar')
+    if (avatarEl) avatarEl.textContent = username[0].toUpperCase()
+  }
+
   fetch(`${API_URL}/api/admin/check`, { credentials: 'include' })
     .then(res => {
-      if (res.ok) showAdminPanel()
-      else showAdminLogin()
+      if (res.ok) {
+        res.json().then(data => setAdminIdentity(data && data.admin && data.admin.username)).catch(() => {})
+        showAdminPanel()
+      } else {
+        showAdminLogin()
+      }
     })
     .catch(() => showAdminLogin())
 
@@ -190,6 +209,7 @@ function initAdminPage() {
         .then(res => res.json().then(data => ({ ok: res.ok, data })))
         .then(({ ok, data }) => {
           if (ok) {
+            setAdminIdentity(data && data.admin && data.admin.username)
             showAdminPanel()
           } else {
             if (errorEl) {
@@ -293,6 +313,12 @@ function initAdminTabs() {
     btn.addEventListener('click', () => {
       tabBtns.forEach(b => b.classList.remove('admin-tab-btn--active'))
       btn.classList.add('admin-tab-btn--active')
+
+      const titleEl = document.getElementById('adminSectionTitle')
+      if (titleEl) {
+        const label = btn.querySelector('.admin-nav-item__label')
+        titleEl.textContent = label ? label.textContent : 'Панель керування'
+      }
 
       const tab = btn.dataset.tab
       const allTabs = ['Bookings', 'Tables', 'Staff', 'Stoplist', 'Users']

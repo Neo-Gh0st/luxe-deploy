@@ -5,309 +5,301 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Адмін-панель — LUXE Restaurant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
-<body>
+<body class="admin-body">
 
-<header class="header">
-  <div class="header__inner">
-    <a href="index.html" class="header__logo gold-gradient">LUXE</a>
-    <nav class="header__nav">
-      <a href="index.html">Головна</a>
-      <a href="menu.html">Меню</a>
-      <a href="about.html">Про нас</a>
-      <a href="contacts.html">Контакти</a>
-      <a href="dashboard.html" class="header__cta">Кабінет</a>
-    </nav>
-    <button class="burger" id="burger" aria-label="Меню">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
+  <!-- ===== LOGIN ===== -->
+  <div id="adminLoginView" class="admin-login">
+    <div class="admin-login__glow admin-login__glow--1"></div>
+    <div class="admin-login__glow admin-login__glow--2"></div>
 
-<nav class="mobile-nav" id="mobileNav">
-  <a href="index.html">Головна</a>
-  <a href="menu.html">Меню</a>
-  <a href="about.html">Про нас</a>
-  <a href="contacts.html">Контакти</a>
-  <a href="booking.html">Бронювання</a>
-  <a href="dashboard.html">Кабінет</a>
-</nav>
+    <div class="admin-login__card">
+      <div class="admin-login__logo gold-gradient">LUXE</div>
+      <p class="admin-login__tagline">Панель керування рестораном</p>
+      <div class="admin-login__divider"></div>
 
-<section class="section" style="padding-top: 120px;">
-  <div class="container">
+      <div class="auth-error" id="adminLoginError"></div>
 
-    <div id="adminLoginView" class="auth-page" style="padding-top: 0;">
-      <div class="auth-card">
-        <div class="auth-card__logo gold-gradient">LUXE</div>
-        <p class="auth-card__subtitle">Вхід для адміністратора</p>
+      <form id="adminLoginForm" class="admin-login__form">
+        <div class="admin-field">
+          <span class="admin-field__icon">👤</span>
+          <input type="text" id="adminUsername" placeholder="Логін" required autocomplete="username">
+        </div>
+        <div class="admin-field">
+          <span class="admin-field__icon">🔒</span>
+          <input type="password" id="adminPassword" placeholder="Пароль" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn--primary admin-login__btn">Увійти</button>
+      </form>
 
-        <div class="auth-error" id="adminLoginError"></div>
-
-        <form id="adminLoginForm" style="display:flex;flex-direction:column;gap:16px;">
-          <input type="text" id="adminUsername" placeholder="Логін" required
-            style="padding:14px 18px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:1rem;">
-          <input type="password" id="adminPassword" placeholder="Пароль" required
-            style="padding:14px 18px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:1rem;">
-          <button type="submit" class="btn btn--primary" style="width:100%;">Увійти</button>
-        </form>
-      </div>
+      <a href="index.html" class="admin-login__back">← Повернутись на сайт</a>
     </div>
+  </div>
 
-    <div id="adminPanelView" hidden>
-      <div class="dashboard-header animate-on-scroll">
-        <div class="dashboard-avatar">A</div>
-        <div style="flex:1;">
-          <div class="dashboard-name" id="adminName">Адміністратор</div>
-          <div class="dashboard-email">Панель керування LUXE Restaurant</div>
-        </div>
-        <div>
-          <button class="btn btn--ghost" id="adminLogoutBtn" style="background:transparent;border:1px solid var(--color-border);color:var(--color-text-muted);padding:8px 20px;border-radius:50px;cursor:pointer;font-size:0.9rem;">Вийти</button>
-        </div>
+  <!-- ===== PANEL ===== -->
+  <div id="adminPanelView" class="admin-layout" hidden>
+
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__brand">
+        <span class="gold-gradient">LUXE</span>
+        <span class="admin-sidebar__brand-sub">Admin Panel</span>
       </div>
 
-      <!-- Quick Metrics Stats Grid -->
-      <div class="admin-stats-grid animate-on-scroll" id="adminStatsGrid">
+      <nav class="admin-sidebar__nav">
+        <button type="button" class="admin-nav-item admin-tab-btn admin-tab-btn--active" data-tab="bookings">
+          <span class="admin-nav-item__icon">🍽️</span>
+          <span class="admin-nav-item__label">Бронювання</span>
+        </button>
+        <button type="button" class="admin-nav-item admin-tab-btn" data-tab="tables">
+          <span class="admin-nav-item__icon">🪑</span>
+          <span class="admin-nav-item__label">Столики та Зали</span>
+        </button>
+        <button type="button" class="admin-nav-item admin-tab-btn" data-tab="staff">
+          <span class="admin-nav-item__icon">👨‍🍳</span>
+          <span class="admin-nav-item__label">Персонал</span>
+        </button>
+        <button type="button" class="admin-nav-item admin-tab-btn" data-tab="stoplist">
+          <span class="admin-nav-item__icon">📋</span>
+          <span class="admin-nav-item__label">Стоп-лист</span>
+        </button>
+        <button type="button" class="admin-nav-item admin-tab-btn" data-tab="users">
+          <span class="admin-nav-item__icon">👤</span>
+          <span class="admin-nav-item__label">Клієнти</span>
+        </button>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a href="index.html" class="admin-sidebar__site-link">🌐 На сайт ресторану</a>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <div class="admin-topbar__left">
+          <h1 class="admin-topbar__title" id="adminSectionTitle">Бронювання</h1>
+          <p class="admin-topbar__date" id="adminTodayDate"></p>
+        </div>
+        <div class="admin-topbar__right">
+          <div class="admin-topbar__user">
+            <div class="admin-topbar__avatar" id="adminAvatar">A</div>
+            <div class="admin-topbar__meta">
+              <div class="admin-topbar__name" id="adminName">Адміністратор</div>
+              <div class="admin-topbar__role">Повний доступ</div>
+            </div>
+          </div>
+          <button type="button" class="admin-logout-btn" id="adminLogoutBtn">Вийти</button>
+        </div>
+      </header>
+
+      <!-- Quick Metrics -->
+      <section class="admin-stats" id="adminStatsGrid">
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">📅</div>
-          <div class="admin-stat-card__val" id="statTodayBookings">0</div>
-          <div class="admin-stat-card__label">Бронювань сьогодні</div>
+          <div>
+            <div class="admin-stat-card__val" id="statTodayBookings">0</div>
+            <div class="admin-stat-card__label">Бронювань сьогодні</div>
+          </div>
         </div>
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">👥</div>
-          <div class="admin-stat-card__val" id="statTodayGuests">0</div>
-          <div class="admin-stat-card__label">Очікуваних гостей</div>
+          <div>
+            <div class="admin-stat-card__val" id="statTodayGuests">0</div>
+            <div class="admin-stat-card__label">Очікуваних гостей</div>
+          </div>
         </div>
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">🪑</div>
-          <div class="admin-stat-card__val" id="statTablesOccupied">0 / 12</div>
-          <div class="admin-stat-card__label">Зайнято столиків</div>
+          <div>
+            <div class="admin-stat-card__val" id="statTablesOccupied">0 / 12</div>
+            <div class="admin-stat-card__label">Зайнято столиків</div>
+          </div>
         </div>
         <div class="admin-stat-card">
           <div class="admin-stat-card__icon">🧑‍🍳</div>
-          <div class="admin-stat-card__val" id="statStaffOnShift">0 / 0</div>
-          <div class="admin-stat-card__label">Персонал на зміні</div>
-        </div>
-      </div>
-
-      <!-- Admin Tabs Navigation -->
-      <div class="admin-tabs animate-on-scroll">
-        <button type="button" class="admin-tab-btn admin-tab-btn--active" data-tab="bookings">🍽️ Бронювання</button>
-        <button type="button" class="admin-tab-btn" data-tab="tables">🪑 Столики та Зали</button>
-        <button type="button" class="admin-tab-btn" data-tab="staff">👥 Робочий персонал</button>
-        <button type="button" class="admin-tab-btn" data-tab="stoplist">📋 Стоп-лист меню</button>
-        <button type="button" class="admin-tab-btn" data-tab="users">👤 Клієнти</button>
-      </div>
-
-      <!-- TAB 1: BOOKINGS -->
-      <div class="admin-tab-content" id="tabContentBookings">
-        <div class="admin-toolbar">
-          <div class="admin-filter-group" id="bookingFilterGroup">
-            <button class="filter-btn filter-btn--active" data-filter="all">Всі</button>
-            <button class="filter-btn" data-filter="pending">⏳ Очікують</button>
-            <button class="filter-btn" data-filter="confirmed">✅ Підтверджені</button>
-            <button class="filter-btn" data-filter="completed">🏁 Завершені</button>
-            <button class="filter-btn" data-filter="cancelled">❌ Відхилені</button>
-          </div>
-          <button class="btn btn--outline" id="btnRefreshBookings" style="padding:8px 18px;font-size:0.85rem;">🔄 Оновити</button>
-        </div>
-
-        <div class="admin-table-wrap" id="adminBookingsWrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Код / Гість</th>
-                <th>Телефон</th>
-                <th>Дата та Час</th>
-                <th>Гостей</th>
-                <th>Зал / Стіл</th>
-                <th>Побажання</th>
-                <th>Статус</th>
-                <th>Дії</th>
-              </tr>
-            </thead>
-            <tbody id="adminBookingsBody"></tbody>
-          </table>
-        </div>
-        <div class="bookings-empty" id="adminBookingsEmpty" hidden>
-          <div class="bookings-empty__icon">🍽️</div>
-          <p>Бронювань у цій категорії поки немає</p>
-        </div>
-      </div>
-
-      <!-- TAB 2: TABLES -->
-      <div class="admin-tab-content" id="tabContentTables" hidden>
-        <div class="admin-toolbar">
-          <p style="color:var(--color-text-muted);font-size:0.95rem;">Натисніть на статус столика для швидкої зміни</p>
-          <div class="admin-filter-group" id="hallFilterGroup">
-            <button class="filter-btn filter-btn--active" data-hall="all">Всі зали</button>
-            <button class="filter-btn" data-hall="Основной зал">Основний зал</button>
-            <button class="filter-btn" data-hall="VIP-зона">VIP-зона</button>
-            <button class="filter-btn" data-hall="Терраса">Тераса</button>
-          </div>
-        </div>
-        <div class="admin-tables-grid" id="adminTablesGrid"></div>
-      </div>
-
-      <!-- TAB 3: STAFF -->
-      <div class="admin-tab-content" id="tabContentStaff" hidden>
-        <div class="admin-toolbar">
-          <p style="color:var(--color-text-muted);font-size:0.95rem;">Керування змінами та співробітниками ресторану</p>
-          <button class="btn btn--primary" id="btnOpenAddStaffModal" style="padding:10px 22px;font-size:0.9rem;">+ Додати співробітника</button>
-        </div>
-
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Співробітник</th>
-                <th>Посада</th>
-                <th>Телефон</th>
-                <th>Зміна</th>
-                <th>Примітка</th>
-                <th>Дії</th>
-              </tr>
-            </thead>
-            <tbody id="adminStaffBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- TAB 4: STOP LIST -->
-      <div class="admin-tab-content" id="tabContentStoplist" hidden>
-        <div class="admin-toolbar">
-          <p style="color:var(--color-text-muted);font-size:0.95rem;">Керування доступністю страв та напоїв у меню</p>
-        </div>
-        <div class="admin-stoplist-grid" id="adminStoplistGrid"></div>
-      </div>
-
-      <!-- TAB 5: USERS -->
-      <div class="admin-tab-content" id="tabContentUsers" hidden>
-        <div class="admin-toolbar">
-          <p style="color:var(--color-text-muted);">Зареєстровані користувачі через Google • Всього: <strong id="adminUsersCount" style="color:var(--color-gold);">0</strong></p>
-        </div>
-        <div class="admin-table-wrap" id="adminTableWrap">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Користувач</th>
-                <th>Email</th>
-                <th>Через</th>
-                <th>Реєстрація</th>
-                <th>Дії</th>
-              </tr>
-            </thead>
-            <tbody id="adminTableBody"></tbody>
-          </table>
-        </div>
-        <div class="bookings-empty" id="adminEmpty" hidden>
-          <div class="bookings-empty__icon">👤</div>
-          <p>Користувачів поки немає</p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Modal: Add Staff -->
-    <div class="modal" id="addStaffModal" hidden>
-      <div class="modal__backdrop" id="closeStaffModalBg"></div>
-      <div class="modal__card auth-card">
-        <div class="auth-card__logo gold-gradient" style="font-size:1.5rem;margin-bottom:8px;">Новий співробітник</div>
-        <p class="auth-card__subtitle" style="margin-bottom:24px;">Додавання члена команди ресторану</p>
-        <form id="addStaffForm" style="display:flex;flex-direction:column;gap:16px;text-align:left;">
           <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">ПІБ</label>
-            <input type="text" id="staffName" placeholder="Іван Іваненко" required style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
+            <div class="admin-stat-card__val" id="statStaffOnShift">0 / 0</div>
+            <div class="admin-stat-card__label">Персонал на зміні</div>
           </div>
-          <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Посада</label>
-            <select id="staffRole" required style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
-              <option value="Шеф-кухар">Шеф-кухар</option>
-              <option value="Су-шеф">Су-шеф</option>
-              <option value="Старший офіціант">Старший офіціант</option>
-              <option value="Офіціант">Офіціант</option>
-              <option value="Офіціант VIP">Офіціант VIP</option>
-              <option value="Хостес">Хостес</option>
-              <option value="Сомельє / Бармен">Сомельє / Бармен</option>
-              <option value="Адміністратор">Адміністратор</option>
-            </select>
+        </div>
+      </section>
+
+      <div class="admin-content">
+
+        <!-- TAB 1: BOOKINGS -->
+        <div class="admin-tab-content" id="tabContentBookings">
+          <div class="admin-toolbar">
+            <div class="admin-filter-group" id="bookingFilterGroup">
+              <button class="filter-btn filter-btn--active" data-filter="all">Всі</button>
+              <button class="filter-btn" data-filter="pending">⏳ Очікують</button>
+              <button class="filter-btn" data-filter="confirmed">✅ Підтверджені</button>
+              <button class="filter-btn" data-filter="completed">🏁 Завершені</button>
+              <button class="filter-btn" data-filter="cancelled">❌ Відхилені</button>
+            </div>
+            <button class="btn btn--outline admin-toolbar__refresh" id="btnRefreshBookings">🔄 Оновити</button>
           </div>
-          <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Телефон</label>
-            <input type="tel" id="staffPhone" placeholder="+380 (__) ___-__-__" style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
+
+          <div class="admin-table-wrap" id="adminBookingsWrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Код / Гість</th>
+                  <th>Телефон</th>
+                  <th>Дата та Час</th>
+                  <th>Гостей</th>
+                  <th>Зал / Стіл</th>
+                  <th>Побажання</th>
+                  <th>Статус</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody id="adminBookingsBody"></tbody>
+            </table>
           </div>
-          <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Зміна зараз</label>
-            <select id="staffShift" style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
-              <option value="on">🟢 На зміні</option>
-              <option value="off" selected>⚪ Вихідний</option>
-            </select>
+          <div class="bookings-empty" id="adminBookingsEmpty" hidden>
+            <div class="bookings-empty__icon">🍽️</div>
+            <p>Бронювань у цій категорії поки немає</p>
           </div>
-          <div>
-            <label style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:6px;display:block;">Примітка</label>
-            <input type="text" id="staffNotes" placeholder="Наприклад: Основний зал" style="width:100%;padding:12px 16px;border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text);">
+        </div>
+
+        <!-- TAB 2: TABLES -->
+        <div class="admin-tab-content" id="tabContentTables" hidden>
+          <div class="admin-toolbar">
+            <p class="admin-toolbar__hint">Натисніть на статус столика для швидкої зміни</p>
+            <div class="admin-filter-group" id="hallFilterGroup">
+              <button class="filter-btn filter-btn--active" data-hall="all">Всі зали</button>
+              <button class="filter-btn" data-hall="Основной зал">Основний зал</button>
+              <button class="filter-btn" data-hall="VIP-зона">VIP-зона</button>
+              <button class="filter-btn" data-hall="Терраса">Тераса</button>
+            </div>
           </div>
-          <div style="display:flex;gap:12px;margin-top:8px;">
-            <button type="button" class="btn btn--outline" id="btnCancelStaff" style="flex:1;">Скасувати</button>
-            <button type="submit" class="btn btn--primary" style="flex:1;">Зберегти</button>
+          <div class="admin-tables-grid" id="adminTablesGrid"></div>
+        </div>
+
+        <!-- TAB 3: STAFF -->
+        <div class="admin-tab-content" id="tabContentStaff" hidden>
+          <div class="admin-toolbar">
+            <p class="admin-toolbar__hint">Керування змінами та співробітниками ресторану</p>
+            <button class="btn btn--primary admin-toolbar__add" id="btnOpenAddStaffModal">+ Додати співробітника</button>
           </div>
-        </form>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Співробітник</th>
+                  <th>Посада</th>
+                  <th>Телефон</th>
+                  <th>Зміна</th>
+                  <th>Примітка</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody id="adminStaffBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 4: STOP LIST -->
+        <div class="admin-tab-content" id="tabContentStoplist" hidden>
+          <div class="admin-toolbar">
+            <p class="admin-toolbar__hint">Керування доступністю страв та напоїв у меню</p>
+          </div>
+          <div class="admin-stoplist-grid" id="adminStoplistGrid"></div>
+        </div>
+
+        <!-- TAB 5: USERS -->
+        <div class="admin-tab-content" id="tabContentUsers" hidden>
+          <div class="admin-toolbar">
+            <p class="admin-toolbar__hint">Зареєстровані користувачі через Google • Всього: <strong class="admin-toolbar__count" id="adminUsersCount">0</strong></p>
+          </div>
+          <div class="admin-table-wrap" id="adminTableWrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Користувач</th>
+                  <th>Email</th>
+                  <th>Через</th>
+                  <th>Реєстрація</th>
+                  <th>Дії</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody"></tbody>
+            </table>
+          </div>
+          <div class="bookings-empty" id="adminEmpty" hidden>
+            <div class="bookings-empty__icon">👤</div>
+            <p>Користувачів поки немає</p>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <!-- Modal: Confirm user deletion -->
-    <div class="modal" id="confirmUserModal" hidden>
-      <div class="modal__backdrop" id="confirmUserBackdrop"></div>
-      <div class="modal__card auth-card">
-        <div class="admin-confirm__icon">🗑️</div>
-        <div class="auth-card__logo gold-gradient" style="font-size:1.4rem;">Прибрати клієнта</div>
-        <p class="auth-card__subtitle" id="confirmUserText" style="margin-bottom:28px;">Видалити клієнта та всі його дані?</p>
-        <div style="display:flex;gap:12px;">
-          <button type="button" class="btn btn--outline" id="confirmUserCancel" style="flex:1;">Скасувати</button>
-          <button type="button" class="btn btn--danger" id="confirmUserOk" style="flex:1;">Видалити назавжди</button>
-        </div>
-      </div>
-    </div>
-
   </div>
-</section>
 
-<footer class="footer">
-  <div class="container">
-    <div class="footer__grid">
-      <div>
-        <div class="footer__logo gold-gradient">LUXE</div>
-        <p class="footer__desc">Ресторан високої кухні в самому серці Києва.</p>
-      </div>
-      <div>
-        <div class="footer__heading">Навігація</div>
-        <div class="footer__links">
-          <a href="index.html">Головна</a>
-          <a href="menu.html">Меню</a>
-          <a href="booking.html">Бронювання</a>
-          <a href="about.html">Про нас</a>
+  <!-- Modal: Add Staff -->
+  <div class="modal" id="addStaffModal" hidden>
+    <div class="modal__backdrop" id="closeStaffModalBg"></div>
+    <div class="modal__card auth-card">
+      <div class="auth-card__logo gold-gradient" style="font-size:1.5rem;margin-bottom:8px;">Новий співробітник</div>
+      <p class="auth-card__subtitle" style="margin-bottom:24px;">Додавання члена команди ресторану</p>
+      <form id="addStaffForm" class="admin-modal-form">
+        <div class="admin-modal-form__row">
+          <label for="staffName">ПІБ</label>
+          <input type="text" id="staffName" placeholder="Іван Іваненко" required>
         </div>
-      </div>
-      <div>
-        <div class="footer__heading">Контакти</div>
-        <div class="footer__links">
-          <a href="contacts.html">Адреса та карта</a>
-          <a href="tel:+380441234567">+380 (44) 123-45-67</a>
+        <div class="admin-modal-form__row">
+          <label for="staffRole">Посада</label>
+          <select id="staffRole" required>
+            <option value="Шеф-кухар">Шеф-кухар</option>
+            <option value="Су-шеф">Су-шеф</option>
+            <option value="Старший офіціант">Старший офіціант</option>
+            <option value="Офіціант">Офіціант</option>
+            <option value="Офіціант VIP">Офіціант VIP</option>
+            <option value="Хостес">Хостес</option>
+            <option value="Сомельє / Бармен">Сомельє / Бармен</option>
+            <option value="Адміністратор">Адміністратор</option>
+          </select>
         </div>
-      </div>
-      <div>
-        <div class="footer__heading">Години роботи</div>
-        <div class="footer__links">
-          <span>Пн–Чт: 12:00 – 23:00</span>
-          <span>Пт–Сб: 12:00 – 01:00</span>
-          <span>Нд: 12:00 – 22:00</span>
+        <div class="admin-modal-form__row">
+          <label for="staffPhone">Телефон</label>
+          <input type="tel" id="staffPhone" placeholder="+380 (__) ___-__-__">
         </div>
+        <div class="admin-modal-form__row">
+          <label for="staffShift">Зміна зараз</label>
+          <select id="staffShift">
+            <option value="on">🟢 На зміні</option>
+            <option value="off" selected>⚪ Вихідний</option>
+          </select>
+        </div>
+        <div class="admin-modal-form__row">
+          <label for="staffNotes">Примітка</label>
+          <input type="text" id="staffNotes" placeholder="Наприклад: Основний зал">
+        </div>
+        <div class="admin-modal-form__buttons">
+          <button type="button" class="btn btn--outline" id="btnCancelStaff">Скасувати</button>
+          <button type="submit" class="btn btn--primary">Зберегти</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Confirm user deletion -->
+  <div class="modal" id="confirmUserModal" hidden>
+    <div class="modal__backdrop" id="confirmUserBackdrop"></div>
+    <div class="modal__card auth-card admin-confirm-card">
+      <div class="admin-confirm__icon">🗑️</div>
+      <div class="auth-card__logo gold-gradient" style="font-size:1.4rem;">Прибрати клієнта</div>
+      <p class="auth-card__subtitle admin-confirm__text" id="confirmUserText">Видалити клієнта та всі його дані?</p>
+      <div class="admin-confirm__buttons">
+        <button type="button" class="btn btn--outline" id="confirmUserCancel">Скасувати</button>
+        <button type="button" class="btn btn--danger" id="confirmUserOk">Видалити назавжди</button>
       </div>
     </div>
-    <div class="footer__bottom">© 2025 LUXE Restaurant. Всі права захищені.</div>
   </div>
-</footer>
 
 <script src="js/script.js"></script>
 </body>

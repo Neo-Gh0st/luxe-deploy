@@ -1211,9 +1211,9 @@ h3 { font-size: clamp(1.2rem, 2vw, 1.5rem); }
 }
 
 .admin-tab-btn--active {
-  background: rgba(201, 168, 76, 0.15) !important;
-  color: var(--color-gold) !important;
-  border-color: rgba(201, 168, 76, 0.4) !important;
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--color-gold);
+  border-color: rgba(201, 168, 76, 0.4);
   font-weight: 600;
 }
 
