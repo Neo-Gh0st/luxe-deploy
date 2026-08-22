@@ -227,6 +227,7 @@ function initAdminPage() {
   // Tabs switching
   initAdminTabs()
   initStaffModal()
+  initUserDeleteModal()
   initBookingFilters()
   initHallFilters()
 }
@@ -639,6 +640,18 @@ window.toggleStopItem = function(id, is_stopped) {
 }
 
 /* ---- Admin: Users ---- */
+function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+let adminUsersCache = {}
+let pendingDeleteUserId = null
+
 function loadAdminUsers() {
   fetch(`${API_URL}/api/admin/users`, { credentials: 'include' })
     .then(res => {
@@ -649,9 +662,12 @@ function loadAdminUsers() {
       const wrap = document.getElementById('adminTableWrap')
       const empty = document.getElementById('adminEmpty')
       const tbody = document.getElementById('adminTableBody')
+      const countEl = document.getElementById('adminUsersCount')
       if (!tbody) return
 
       if (!data.users || !data.users.length) {
+        adminUsersCache = {}
+        if (countEl) countEl.textContent = '0'
         if (wrap) wrap.hidden = true
         if (empty) {
           empty.hidden = false
@@ -661,16 +677,23 @@ function loadAdminUsers() {
       }
 
       const providers = { google: 'Google' }
+      adminUsersCache = {}
+      data.users.forEach(u => { adminUsersCache[u.id] = u })
+      if (countEl) countEl.textContent = data.users.length
+
       tbody.innerHTML = data.users.map(u => {
         const avatar = u.avatar
-          ? `<img class="admin-avatar" src="${u.avatar}" alt="">`
-          : `<span style="display:inline-block;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-gold),var(--color-gold-dark));color:var(--color-bg);font-weight:700;text-align:center;line-height:36px;">${(u.name || u.email || 'U')[0].toUpperCase()}</span>`
+          ? `<img class="admin-avatar" src="${escapeHtml(u.avatar)}" alt="">`
+          : `<span class="admin-avatar admin-avatar--fallback">${escapeHtml((u.name || u.email || 'U')[0].toUpperCase())}</span>`
         const created = new Date(u.created_at).toLocaleDateString('uk-UA')
         return `<tr>
-          <td>${avatar} ${u.name || '—'}</td>
-          <td>${u.email}</td>
-          <td>${providers[u.provider] || u.provider}</td>
+          <td>${avatar} ${escapeHtml(u.name || '—')}</td>
+          <td>${escapeHtml(u.email)}</td>
+          <td>${providers[u.provider] || escapeHtml(u.provider)}</td>
           <td>${created}</td>
+          <td>
+            <button class="act-btn act-btn--delete user-delete-btn" onclick="deleteUserItem(${u.id})">🗑️ Прибрати клієнта</button>
+          </td>
         </tr>`
       }).join('')
 
@@ -687,6 +710,72 @@ function loadAdminUsers() {
         empty.classList.add('animate-on-scroll--visible')
       }
     })
+}
+
+window.deleteUserItem = function(id) {
+  const user = adminUsersCache[id]
+  const name = user ? (user.name || user.email) : 'клієнта'
+  const textEl = document.getElementById('confirmUserText')
+  if (textEl) {
+    textEl.innerHTML = `Клієнта <strong style="color:var(--color-text);">${escapeHtml(name)}</strong> буде повністю видалено з бази даних разом із сесіями авторизації. Дію неможливо скасувати.`
+  }
+  pendingDeleteUserId = id
+  const modal = document.getElementById('confirmUserModal')
+  if (modal) {
+    modal.hidden = false
+    modal.style.display = 'flex'
+  }
+}
+
+function closeConfirmUserModal() {
+  pendingDeleteUserId = null
+  const modal = document.getElementById('confirmUserModal')
+  if (modal) {
+    modal.hidden = true
+    modal.style.display = 'none'
+  }
+}
+
+function initUserDeleteModal() {
+  const modal = document.getElementById('confirmUserModal')
+  if (!modal) return
+
+  const cancelBtn = document.getElementById('confirmUserCancel')
+  const okBtn = document.getElementById('confirmUserOk')
+  const backdrop = document.getElementById('confirmUserBackdrop')
+
+  if (cancelBtn) cancelBtn.addEventListener('click', closeConfirmUserModal)
+  if (backdrop) backdrop.addEventListener('click', closeConfirmUserModal)
+
+  if (okBtn) {
+    okBtn.addEventListener('click', () => {
+      if (pendingDeleteUserId == null) return
+      const id = pendingDeleteUserId
+      okBtn.disabled = true
+      okBtn.textContent = 'Видалення...'
+
+      fetch(`${API_URL}/api/admin/users/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+        .then(res => res.json().then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+          if (ok) {
+            closeConfirmUserModal()
+            loadAdminUsers()
+          } else {
+            alert(data.error || 'Не вдалося видалити клієнта')
+          }
+        })
+        .catch(() => {
+          alert('Немає зв’язку із сервером. Спробуйте пізніше.')
+        })
+        .finally(() => {
+          okBtn.disabled = false
+          okBtn.textContent = 'Видалити назавжди'
+        })
+    })
+  }
 }
 
 function initHeaderAuth() {

@@ -230,6 +230,16 @@ h3 { font-size: clamp(1.2rem, 2vw, 1.5rem); }
   color: var(--color-bg);
 }
 
+.btn--danger {
+  background: linear-gradient(135deg, #e05252, #c62828);
+  color: #ffffff;
+}
+
+.btn--danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(229, 83, 83, 0.3);
+}
+
 /* ---- Hero ---- */
 .hero {
   min-height: 100vh;
@@ -1104,6 +1114,29 @@ h3 { font-size: clamp(1.2rem, 2vw, 1.5rem); }
   border-radius: 50%;
   object-fit: cover;
   vertical-align: middle;
+}
+
+.admin-avatar--fallback {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark));
+  color: var(--color-bg);
+  font-weight: 700;
+  text-align: center;
+  line-height: 36px;
+}
+
+.admin-confirm__icon {
+  font-size: 2.6rem;
+  margin-bottom: 12px;
+}
+
+.user-delete-btn {
+  white-space: nowrap;
+}
+
+.user-delete-btn:hover {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: rgba(244, 67, 54, 0.5);
 }
 
 /* ---- Admin Stats Grid ---- */

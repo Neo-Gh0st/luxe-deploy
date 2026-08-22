@@ -184,8 +184,8 @@
 
       <!-- TAB 5: USERS -->
       <div class="admin-tab-content" id="tabContentUsers" hidden>
-        <div class="section-header" style="margin-bottom:24px;">
-          <p style="color:var(--color-text-muted);">Зареєстровані користувачі через Google</p>
+        <div class="admin-toolbar">
+          <p style="color:var(--color-text-muted);">Зареєстровані користувачі через Google • Всього: <strong id="adminUsersCount" style="color:var(--color-gold);">0</strong></p>
         </div>
         <div class="admin-table-wrap" id="adminTableWrap">
           <table class="admin-table">
@@ -195,6 +195,7 @@
                 <th>Email</th>
                 <th>Через</th>
                 <th>Реєстрація</th>
+                <th>Дії</th>
               </tr>
             </thead>
             <tbody id="adminTableBody"></tbody>
@@ -252,6 +253,20 @@
             <button type="submit" class="btn btn--primary" style="flex:1;">Зберегти</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Modal: Confirm user deletion -->
+    <div class="modal" id="confirmUserModal" hidden>
+      <div class="modal__backdrop" id="confirmUserBackdrop"></div>
+      <div class="modal__card auth-card">
+        <div class="admin-confirm__icon">🗑️</div>
+        <div class="auth-card__logo gold-gradient" style="font-size:1.4rem;">Прибрати клієнта</div>
+        <p class="auth-card__subtitle" id="confirmUserText" style="margin-bottom:28px;">Видалити клієнта та всі його дані?</p>
+        <div style="display:flex;gap:12px;">
+          <button type="button" class="btn btn--outline" id="confirmUserCancel" style="flex:1;">Скасувати</button>
+          <button type="button" class="btn btn--danger" id="confirmUserOk" style="flex:1;">Видалити назавжди</button>
+        </div>
       </div>
     </div>
 
