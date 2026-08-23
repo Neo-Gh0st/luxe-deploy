@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ---- Auth ---- */
 const API_URL = 'https://auth.restaurant-luxe.pp.ua'
+const GOOGLE_CLIENT_ID = '933452972431-2k4duni61277l1qkr4tsn25ibqgemhc8.apps.googleusercontent.com'
 
 function initAuth() {
   if (document.getElementById('googleBtn') || document.getElementById('authError')) {
@@ -42,13 +43,13 @@ function initAuthPage() {
   const error = params.get('error')
   if (error) {
     const messages = {
-      access_denied: 'Доступ запрещён. Попробуйте ещё раз.',
-      invalid_state: 'Ошибка проверки сессии. Попробуйте снова.',
-      token_exchange: 'Не удалось получить доступ от Google. Попробуйте снова.',
-      userinfo: 'Не удалось получить данные профиля. Попробуйте снова.',
-      server_error: 'Внутренняя ошибка сервера. Попробуйте позже.'
+      access_denied: 'Доступ заборонено. Спробуйте ще раз.',
+      invalid_state: 'Помилка перевірки сесії. Спробуйте знову.',
+      token_exchange: 'Не вдалося отримати доступ від Google. Спробуйте знову.',
+      userinfo: 'Не вдалося отримати дані профілю. Спробуйте знову.',
+      server_error: 'Внутрішня помилка сервера. Спробуйте пізніше.'
     }
-    showAuthError(messages[error] || 'Ошибка входа. Попробуйте ещё раз.')
+    showAuthError(messages[error] || 'Помилка входу. Спробуйте ще раз.')
   }
 
   fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
@@ -60,7 +61,7 @@ function initAuthPage() {
   const googleBtn = document.getElementById('googleBtn')
   if (googleBtn && window.google && window.google.accounts) {
     google.accounts.id.initialize({
-      client_id: '933452972431-2k4duni61277l1qkr4tsn25ibqgemhc8.apps.googleusercontent.com',
+      client_id: GOOGLE_CLIENT_ID,
       callback: handleGoogleCredential,
       ux_mode: 'popup'
     })
@@ -71,13 +72,13 @@ function initAuthPage() {
       width: 320
     })
   } else if (googleBtn) {
-    googleBtn.innerHTML = '<button class="auth-btn" onclick="location.href=\'' + API_URL + '/api/auth/google\'">Продолжить с Google</button>'
+    googleBtn.innerHTML = '<button class="auth-btn" onclick="location.href=\'' + API_URL + '/api/auth/google\'">Продовжити з Google</button>'
   }
 }
 
 function handleGoogleCredential(response) {
   if (!response || !response.credential) {
-    showAuthError('Не удалось получить данные от Google. Попробуйте ещё раз.')
+    showAuthError('Не вдалося отримати дані від Google. Спробуйте ще раз.')
     return
   }
 
@@ -90,13 +91,22 @@ function handleGoogleCredential(response) {
     .then(res => res.json().then(data => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
       if (ok) {
-        window.location.href = 'dashboard.html'
+        if (document.getElementById('bookingForm') && document.getElementById('bookingAuthGate')) {
+          window.location.reload()
+        } else {
+          window.location.href = 'dashboard.html'
+        }
       } else {
-        showAuthError(data.error || 'Ошибка входа. Попробуйте ещё раз.')
+        showAuthError(data.error || 'Помилка входу. Спробуйте ще раз.')
+        const gateError = document.getElementById('bookingGateError')
+        if (gateError) {
+          gateError.textContent = data.error || 'Помилка входу. Спробуйте ще раз.'
+          gateError.style.display = 'block'
+        }
       }
     })
     .catch(() => {
-      showAuthError('Нет связи с сервером. Попробуйте позже.')
+      showAuthError('Немає зв’язку із сервером. Спробуйте пізніше.')
     })
 }
 
@@ -407,6 +417,7 @@ function loadAdminBookings(statusFilter = 'all') {
           <td>
             <strong>${b.guest_name || 'Гість'}</strong>
             <div style="font-size:0.75rem;color:var(--color-gold);letter-spacing:1px;">${b.booking_code}</div>
+            ${b.user_email ? `<div style="font-size:0.72rem;color:var(--color-text-muted);margin-top:2px;">👤 ${b.user_email}</div>` : ''}
           </td>
           <td>
             <div>${b.phone || '—'}</div>
@@ -909,6 +920,8 @@ function initBookingForm() {
 
   if (!form) return
 
+  initBookingAuthGate()
+
   if (dateInput) {
     const today = new Date().toISOString().split('T')[0]
     dateInput.setAttribute('min', today)
@@ -962,10 +975,14 @@ function initBookingForm() {
         notes
       })
     })
-      .then(res => res.json().then(data => ({ ok: res.ok, data })))
-      .then(({ ok, data }) => {
+      .then(res => res.json().then(data => ({ ok: res.ok, status: res.status, data })))
+      .then(({ ok, status, data }) => {
         if (!ok || !data.booking) {
-          alert(data.error || 'Помилка під час відправки заявки')
+          if (status === 401) {
+            showBookingGate()
+          } else {
+            alert(data.error || 'Помилка під час відправки заявки')
+          }
           if (submitBtn) {
             submitBtn.textContent = 'Забронювати столик'
             submitBtn.disabled = false
@@ -1074,6 +1091,59 @@ function showFinalBookingSuccess(booking) {
       👥 Гостей: <strong>${booking.guests_count}</strong> | Код броні: <strong>${booking.booking_code}</strong>
     `
   }
+}
+
+function renderBookingGateButton(attempt) {
+  const gateBtn = document.getElementById('bookingGoogleBtn')
+  if (!gateBtn) return
+  if (gateBtn.hasChildNodes()) return
+
+  if (window.google && window.google.accounts) {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      ux_mode: 'popup'
+    })
+    google.accounts.id.renderButton(gateBtn, {
+      theme: 'outline',
+      size: 'large',
+      shape: 'pill',
+      width: 320
+    })
+  } else if (attempt < 24) {
+    // GIS-скрипт ще вантажиться — пробуємо ще раз за 250мс
+    setTimeout(() => renderBookingGateButton(attempt + 1), 250)
+  } else {
+    gateBtn.innerHTML = '<button class="auth-btn" onclick="location.href=\'' + API_URL + '/api/auth/google\'">Продовжити з Google</button>'
+  }
+}
+
+function showBookingGate() {
+  const form = document.getElementById('bookingForm')
+  const gate = document.getElementById('bookingAuthGate')
+  if (form) form.style.display = 'none'
+  if (!gate) return
+  gate.style.display = 'block'
+  renderBookingGateButton(0)
+}
+
+function initBookingAuthGate() {
+  fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
+    .then(res => {
+      if (!res.ok) {
+        showBookingGate()
+        return null
+      }
+      return res.json()
+    })
+    .then(data => {
+      if (!data || !data.user) return
+      const nameInput = document.getElementById('bookingName')
+      if (nameInput && !nameInput.value && data.user.name) {
+        nameInput.value = data.user.name
+      }
+    })
+    .catch(() => showBookingGate())
 }
 
 /* ---- Guest Counter ---- */

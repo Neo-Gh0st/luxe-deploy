@@ -43,6 +43,17 @@
       <div class="divider"></div>
     </div>
 
+    <!-- Auth gate: booking requires login -->
+    <div class="auth-card animate-on-scroll" id="bookingAuthGate" style="display:none;float:none;margin:0 auto 48px;">
+      <div class="auth-card__logo gold-gradient">LUXE</div>
+      <p class="auth-card__subtitle">🔒 Бронювання столиків доступне після входу</p>
+      <div class="auth-error" id="bookingGateError"></div>
+      <div class="auth-card__buttons">
+        <div id="bookingGoogleBtn"></div>
+      </div>
+      <p class="auth-card__footer">Увійдіть через Google-акаунт, щоб забронювати столик</p>
+    </div>
+
     <form class="booking-form animate-on-scroll" id="bookingForm">
       <div class="form-row">
         <div class="form-group">
@@ -191,6 +202,7 @@
   </div>
 </footer>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="js/script.js"></script>
 </body>
 </html>
