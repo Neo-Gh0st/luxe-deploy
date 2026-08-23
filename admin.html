@@ -6,8 +6,8 @@
   <title>Адмін-панель — LUXE Restaurant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260824">
-  <link rel="stylesheet" href="css/admin.css?v=20260824">
+  <link rel="stylesheet" href="css/style.css?v=20260825">
+  <link rel="stylesheet" href="css/admin.css?v=20260825">
 </head>
 <body class="admin-body">
 
@@ -167,13 +167,19 @@
 
         <!-- TAB 2: TABLES -->
         <div class="admin-tab-content" id="tabContentTables" hidden>
+          <div class="admin-toolbar admin-toolbar--column">
+            <div class="admin-toolbar__row">
+              <p class="admin-toolbar__hint">Зали ресторану — додавайте та видаляйте категорії (Тераса, VIP тощо)</p>
+              <button type="button" class="btn btn--primary admin-toolbar__add" id="btnOpenAddHallModal">+ Додати зал</button>
+            </div>
+            <div class="admin-halls-chips" id="adminHallsChips"></div>
+          </div>
+
           <div class="admin-toolbar">
             <p class="admin-toolbar__hint">Натисніть на статус столика для швидкої зміни</p>
-            <div class="admin-filter-group" id="hallFilterGroup">
-              <button class="filter-btn filter-btn--active" data-hall="all">Всі зали</button>
-              <button class="filter-btn" data-hall="Основний зал">Основний зал</button>
-              <button class="filter-btn" data-hall="VIP-зона">VIP-зона</button>
-              <button class="filter-btn" data-hall="Тераса">Тераса</button>
+            <div class="admin-toolbar__row">
+              <div class="admin-filter-group" id="hallFilterGroup"></div>
+              <button type="button" class="btn btn--outline admin-toolbar__add" id="btnOpenAddTableModal">+ Додати столик</button>
             </div>
           </div>
           <div class="admin-tables-grid" id="adminTablesGrid"></div>
@@ -207,6 +213,7 @@
         <div class="admin-tab-content" id="tabContentStoplist" hidden>
           <div class="admin-toolbar">
             <p class="admin-toolbar__hint">Керування доступністю страв та напоїв у меню</p>
+            <button type="button" class="btn btn--primary admin-toolbar__add" id="btnOpenAddStopItemModal">+ Додати страву</button>
           </div>
           <div class="admin-stoplist-grid" id="adminStoplistGrid"></div>
         </div>
@@ -237,6 +244,77 @@
         </div>
 
       </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Hall -->
+  <div class="modal" id="addHallModal" hidden>
+    <div class="modal__backdrop" id="closeHallModalBg"></div>
+    <div class="modal__card auth-card">
+      <div class="auth-card__logo gold-gradient" style="font-size:1.5rem;margin-bottom:8px;">Новий зал</div>
+      <p class="auth-card__subtitle" style="margin-bottom:24px;">Категорія залу (наприклад: Лофт, Бенуар)</p>
+      <form id="addHallForm" class="admin-modal-form">
+        <div class="admin-modal-form__row">
+          <label for="hallName">Назва залу</label>
+          <input type="text" id="hallName" placeholder="Наприклад: Лофт" required maxlength="50">
+        </div>
+        <div class="admin-modal-form__buttons">
+          <button type="button" class="btn btn--outline" id="btnCancelHall">Скасувати</button>
+          <button type="submit" class="btn btn--primary">Додати</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Table -->
+  <div class="modal" id="addTableModal" hidden>
+    <div class="modal__backdrop" id="closeTableModalBg"></div>
+    <div class="modal__card auth-card">
+      <div class="auth-card__logo gold-gradient" style="font-size:1.5rem;margin-bottom:8px;">Новий столик</div>
+      <p class="auth-card__subtitle" style="margin-bottom:24px;">Номер столика присвоїться автоматично</p>
+      <form id="addTableForm" class="admin-modal-form">
+        <div class="admin-modal-form__row">
+          <label for="tableHall">Зал</label>
+          <select id="tableHall" required></select>
+        </div>
+        <div class="admin-modal-form__row">
+          <label for="tableCapacity">Кількість місць (1–30)</label>
+          <input type="number" id="tableCapacity" min="1" max="30" value="4" required>
+        </div>
+        <div class="admin-modal-form__buttons">
+          <button type="button" class="btn btn--outline" id="btnCancelTable">Скасувати</button>
+          <button type="submit" class="btn btn--primary">Додати</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Stop List Item -->
+  <div class="modal" id="addStopItemModal" hidden>
+    <div class="modal__backdrop" id="closeStopItemModalBg"></div>
+    <div class="modal__card auth-card">
+      <div class="auth-card__logo gold-gradient" style="font-size:1.5rem;margin-bottom:8px;">Нова страва</div>
+      <p class="auth-card__subtitle" style="margin-bottom:24px;">Позиція для керування стоп-листом</p>
+      <form id="addStopItemForm" class="admin-modal-form">
+        <div class="admin-modal-form__row">
+          <label for="stopItemName">Назва страви або напою</label>
+          <input type="text" id="stopItemName" placeholder="Наприклад: Дорадо на грилі" required maxlength="120">
+        </div>
+        <div class="admin-modal-form__row">
+          <label for="stopItemCategory">Категорія</label>
+          <input type="text" id="stopItemCategory" placeholder="Закуски / Основні страви / Десерти / Бар" list="stopItemCategoryList" maxlength="60">
+          <datalist id="stopItemCategoryList">
+            <option value="Закуски">
+            <option value="Основні страви">
+            <option value="Десерти">
+            <option value="Бар">
+          </datalist>
+        </div>
+        <div class="admin-modal-form__buttons">
+          <button type="button" class="btn btn--outline" id="btnCancelStopItem">Скасувати</button>
+          <button type="submit" class="btn btn--primary">Додати</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -301,6 +379,6 @@
     </div>
   </div>
 
-<script src="js/script.js?v=20260824"></script>
+<script src="js/script.js?v=20260825"></script>
 </body>
 </html>

@@ -295,7 +295,8 @@ function initAdminPage() {
   initStaffModal()
   initUserDeleteModal()
   initBookingFilters()
-  initHallFilters()
+  initTablesManagement()
+  initStopItemModal()
 }
 
 function showAdminLogin() {
@@ -507,48 +508,211 @@ window.deleteBookingItem = function(id) {
     })
 }
 
-/* ---- Admin: Tables ---- */
-function initHallFilters() {
-  const hallBtns = document.querySelectorAll('#hallFilterGroup .filter-btn')
-  hallBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      hallBtns.forEach(b => b.classList.remove('filter-btn--active'))
-      btn.classList.add('filter-btn--active')
-      loadAdminTables(btn.dataset.hall)
-    })
-  })
+/* ---- Admin: Tables & Halls ---- */
+let selectedHallFilter = 'all'
+let lastTables = []
+let adminHallsCache = {}
+
+function renderHallChips(halls, tables) {
+  const chips = document.getElementById('adminHallsChips')
+  if (!chips) return
+  adminHallsCache = {}
+  halls.forEach(h => { adminHallsCache[h.id] = h })
+
+  chips.innerHTML = halls.length ? halls.map(h => {
+    const count = tables.filter(t => t.hall === h.name).length
+    return `<span class="admin-hall-chip">
+      <span class="admin-hall-chip__name">${escapeHtml(h.name)}</span>
+      <span class="admin-hall-chip__count">${count} стол.</span>
+      <button type="button" class="admin-hall-chip__x" title="Видалити зал" onclick="deleteHallItem(${h.id})">✕</button>
+    </span>`
+  }).join('') : '<span style="color:var(--color-text-muted);font-size:0.85rem;">Залів поки немає — додайте перший зал кнопкою вище</span>'
 }
 
-function loadAdminTables(hallFilter = 'all') {
-  adminFetch('/api/admin/tables')
-    .then(res => res ? res.json() : null)
-    .then(data => {
-      const grid = document.getElementById('adminTablesGrid')
-      if (!grid || !data || !data.tables) return
+function renderHallFilter(halls) {
+  const group = document.getElementById('hallFilterGroup')
+  if (!group) return
 
-      let list = data.tables
-      if (hallFilter && hallFilter !== 'all') {
-        list = list.filter(t => t.hall === hallFilter)
+  if (!group.dataset.delegated) {
+    group.dataset.delegated = '1'
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-btn')
+      if (!btn) return
+      selectedHallFilter = btn.dataset.hall || 'all'
+      group.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('filter-btn--active', b === btn))
+      renderTablesGrid()
+    })
+  }
+
+  group.innerHTML = `<button type="button" class="filter-btn${selectedHallFilter === 'all' ? ' filter-btn--active' : ''}" data-hall="all">Всі зали</button>` +
+    halls.map(h => `<button type="button" class="filter-btn${selectedHallFilter === h.name ? ' filter-btn--active' : ''}" data-hall="${escapeHtml(h.name)}">${escapeHtml(h.name)}</button>`).join('')
+}
+
+function renderTablesGrid() {
+  const grid = document.getElementById('adminTablesGrid')
+  if (!grid) return
+
+  let list = lastTables
+  if (selectedHallFilter !== 'all') {
+    list = list.filter(t => t.hall === selectedHallFilter)
+  }
+
+  const statusBtnLabels = {
+    free: '🟢 Вільний (клік)',
+    occupied: '🔴 Зайнятий (клік)',
+    reserved: '🟡 Заброньований (клік)'
+  }
+
+  grid.innerHTML = list.map(t => {
+    return `<div class="table-card table-card--${t.status}">
+      <div class="table-card__top">
+        <div class="table-card__num">Стіл #${t.number}</div>
+        <button type="button" class="table-card__delete" title="Видалити столик" onclick="deleteTableItem(${t.id})">🗑️</button>
+      </div>
+      <div class="table-card__hall">${escapeHtml(t.hall)}</div>
+      <div class="table-card__cap">👥 До ${t.capacity} персон</div>
+      <button type="button" class="table-card__status-btn table-card__status-btn--${t.status}" onclick="cycleTableStatus(${t.id}, '${t.status}')">
+        ${statusBtnLabels[t.status] || t.status}
+      </button>
+    </div>`
+  }).join('') || '<p style="color:var(--color-text-muted);padding:20px 0;">У цьому залі поки немає столиків</p>'
+}
+
+function loadAdminTables() {
+  Promise.all([
+    adminFetch('/api/halls').then(r => r ? r.json() : null),
+    adminFetch('/api/admin/tables').then(r => r ? r.json() : null)
+  ])
+    .then(([hallsData, tablesData]) => {
+      if (!hallsData && !tablesData) return
+      const halls = (hallsData && hallsData.halls) || []
+      lastTables = (tablesData && tablesData.tables) || []
+
+      renderHallChips(halls, lastTables)
+      renderHallFilter(halls)
+      renderTablesGrid()
+
+      const sel = document.getElementById('tableHall')
+      if (sel) {
+        const prev = sel.value
+        sel.innerHTML = halls.map(h => `<option value="${escapeHtml(h.name)}">${escapeHtml(h.name)}</option>`).join('')
+        if (prev && halls.some(h => h.name === prev)) sel.value = prev
       }
-
-      const statusBtnLabels = {
-        free: '🟢 Вільний (клік для зміни)',
-        occupied: '🔴 Зайнятий (клік для зміни)',
-        reserved: '🟡 Заброньований (клік для зміни)'
-      }
-
-      grid.innerHTML = list.map(t => {
-        return `<div class="table-card table-card--${t.status}">
-          <div class="table-card__num">Стіл #${t.number}</div>
-          <div class="table-card__hall">${t.hall}</div>
-          <div class="table-card__cap">👥 До ${t.capacity} персон</div>
-          <button type="button" class="table-card__status-btn table-card__status-btn--${t.status}" onclick="cycleTableStatus(${t.id}, '${t.status}')">
-            ${statusBtnLabels[t.status] || t.status}
-          </button>
-        </div>`
-      }).join('')
     })
     .catch(() => {})
+}
+
+window.deleteHallItem = function(id) {
+  const hall = adminHallsCache[id]
+  const name = hall ? hall.name : 'цей зал'
+  if (!confirm(`Видалити зал «${name}»? Зал можна видалити, лише якщо в ньому не залишилось столиків.`)) return
+
+  fetch(`${API_URL}/api/admin/halls/${id}`, { method: 'DELETE', credentials: 'include' })
+    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(({ ok, data }) => {
+      if (!ok) {
+        alert(data.error || 'Не вдалося видалити зал')
+        return
+      }
+      if (selectedHallFilter === name) selectedHallFilter = 'all'
+      loadAdminTables()
+    })
+    .catch(() => alert('Немає зв’язку із сервером. Спробуйте пізніше.'))
+}
+
+window.deleteTableItem = function(id) {
+  if (!confirm('Видалити цей столик?')) return
+  fetch(`${API_URL}/api/admin/tables/${id}`, { method: 'DELETE', credentials: 'include' })
+    .then(() => {
+      loadAdminTables()
+      loadAdminStats()
+    })
+    .catch(() => {})
+}
+
+function initTablesManagement() {
+  const hallModal = document.getElementById('addHallModal')
+  const tableModal = document.getElementById('addTableModal')
+
+  const openModal = (m) => { m.hidden = false; m.style.display = 'flex' }
+  const closeModal = (m) => { m.hidden = true; m.style.display = 'none' }
+
+  const hallBtn = document.getElementById('btnOpenAddHallModal')
+  if (hallBtn && hallModal) {
+    hallBtn.addEventListener('click', () => {
+      const input = document.getElementById('hallName')
+      if (input) input.value = ''
+      openModal(hallModal)
+    })
+    const cancelHall = document.getElementById('btnCancelHall')
+    if (cancelHall) cancelHall.addEventListener('click', () => closeModal(hallModal))
+    const hallBg = document.getElementById('closeHallModalBg')
+    if (hallBg) hallBg.addEventListener('click', () => closeModal(hallModal))
+
+    const hallForm = document.getElementById('addHallForm')
+    if (hallForm) {
+      hallForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const name = document.getElementById('hallName').value.trim()
+        if (!name) return
+        fetch(`${API_URL}/api/admin/halls`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        })
+          .then(res => res.json().then(data => ({ ok: res.ok, data })))
+          .then(({ ok, data }) => {
+            if (ok) {
+              closeModal(hallModal)
+              loadAdminTables()
+            } else {
+              alert(data.error || 'Не вдалося додати зал')
+            }
+          })
+          .catch(() => alert('Немає зв’язку із сервером. Спробуйте пізніше.'))
+      })
+    }
+  }
+
+  const tableBtn = document.getElementById('btnOpenAddTableModal')
+  if (tableBtn && tableModal) {
+    tableBtn.addEventListener('click', () => openModal(tableModal))
+    const cancelTable = document.getElementById('btnCancelTable')
+    if (cancelTable) cancelTable.addEventListener('click', () => closeModal(tableModal))
+    const tableBg = document.getElementById('closeTableModalBg')
+    if (tableBg) tableBg.addEventListener('click', () => closeModal(tableModal))
+
+    const tableForm = document.getElementById('addTableForm')
+    if (tableForm) {
+      tableForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const hall = document.getElementById('tableHall').value
+        const capacity = document.getElementById('tableCapacity').value
+        if (!hall) {
+          alert('Спочатку додайте хоча б один зал')
+          return
+        }
+        fetch(`${API_URL}/api/admin/tables`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hall, capacity })
+        })
+          .then(res => res.json().then(data => ({ ok: res.ok, data })))
+          .then(({ ok, data }) => {
+            if (ok) {
+              closeModal(tableModal)
+              loadAdminTables()
+              loadAdminStats()
+            } else {
+              alert(data.error || 'Не вдалося додати столик')
+            }
+          })
+          .catch(() => alert('Немає зв’язку із сервером. Спробуйте пізніше.'))
+      })
+    }
+  }
 }
 
 window.cycleTableStatus = function(id, currentStatus) {
@@ -567,8 +731,7 @@ window.cycleTableStatus = function(id, currentStatus) {
   })
     .then(res => res.json())
     .then(() => {
-      const activeBtn = document.querySelector('#hallFilterGroup .filter-btn--active')
-      loadAdminTables(activeBtn ? activeBtn.dataset.hall : 'all')
+      loadAdminTables()
       loadAdminStats()
     })
 }
@@ -695,19 +858,79 @@ function loadAdminStopList() {
         const isAvailable = !item.is_stopped
         return `<div class="stoplist-card ${item.is_stopped ? 'stoplist-card--stopped' : ''}">
           <div>
-            <div class="stoplist-card__title">${item.item_name}</div>
-            <div class="stoplist-card__cat">${item.category} • <span style="color:${isAvailable ? '#81c784' : '#e57373'};">${isAvailable ? 'В наявності' : 'У стоп-листі'}</span></div>
+            <div class="stoplist-card__title">${escapeHtml(item.item_name)}</div>
+            <div class="stoplist-card__cat">${escapeHtml(item.category)} • <span style="color:${isAvailable ? '#81c784' : '#e57373'};">${isAvailable ? 'В наявності' : 'У стоп-листі'}</span></div>
           </div>
-          <div>
+          <div class="stoplist-card__actions">
             <label class="switch">
               <input type="checkbox" ${isAvailable ? 'checked' : ''} onchange="toggleStopItem(${item.id}, !this.checked)">
               <span class="slider"></span>
             </label>
+            <button type="button" class="act-btn act-btn--delete" title="Видалити позицію" onclick="deleteStopItem(${item.id})">🗑️</button>
           </div>
         </div>`
       }).join('')
     })
     .catch(() => {})
+}
+
+window.deleteStopItem = function(id) {
+  if (!confirm('Видалити цю позицію зі стоп-листа?')) return
+  fetch(`${API_URL}/api/admin/stop-list/${id}`, { method: 'DELETE', credentials: 'include' })
+    .then(() => loadAdminStopList())
+    .catch(() => {})
+}
+
+function initStopItemModal() {
+  const modal = document.getElementById('addStopItemModal')
+  if (!modal) return
+
+  const openBtn = document.getElementById('btnOpenAddStopItemModal')
+  const cancelBtn = document.getElementById('btnCancelStopItem')
+  const bg = document.getElementById('closeStopItemModalBg')
+  const form = document.getElementById('addStopItemForm')
+
+  const closeModal = () => {
+    modal.hidden = true
+    modal.style.display = 'none'
+  }
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      if (form) form.reset()
+      modal.hidden = false
+      modal.style.display = 'flex'
+    })
+  }
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal)
+  if (bg) bg.addEventListener('click', closeModal)
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault()
+      const item_name = document.getElementById('stopItemName').value.trim()
+      const category = document.getElementById('stopItemCategory').value.trim()
+      if (!item_name) return
+
+      fetch(`${API_URL}/api/admin/stop-list`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_name, category })
+      })
+        .then(res => res.json().then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+          if (ok) {
+            form.reset()
+            closeModal()
+            loadAdminStopList()
+          } else {
+            alert(data.error || 'Не вдалося додати страву')
+          }
+        })
+        .catch(() => alert('Немає зв’язку із сервером. Спробуйте пізніше.'))
+    })
+  }
 }
 
 window.toggleStopItem = function(id, is_stopped) {
@@ -1222,15 +1445,38 @@ function initGuestCounter() {
 
 /* ---- Hall Cards ---- */
 function initHallCards() {
-  const hallCards = document.querySelectorAll('.hall-card')
-  if (!hallCards.length) return
+  const container = document.querySelector('.halls')
+  if (!container || container.dataset.delegated) return
+  container.dataset.delegated = '1'
 
-  hallCards.forEach(card => {
-    card.addEventListener('click', () => {
-      hallCards.forEach(c => c.classList.remove('hall-card--active'))
-      card.classList.add('hall-card--active')
-    })
+  container.addEventListener('click', (e) => {
+    const card = e.target.closest('.hall-card')
+    if (!card) return
+    container.querySelectorAll('.hall-card').forEach(c => c.classList.remove('hall-card--active'))
+    card.classList.add('hall-card--active')
   })
+}
+
+function loadBookingHalls() {
+  const container = document.querySelector('.halls')
+  if (!container) return
+
+  fetch(`${API_URL}/api/halls`)
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      if (!data || !data.halls || !data.halls.length) return
+      const icons = ['🍽️', '👑', '🌸', '🎩', '🕯️', '🎷', '🌿', '💎']
+      const activeCard = container.querySelector('.hall-card--active')
+      const activeHall = activeCard ? activeCard.dataset.hall : null
+
+      container.innerHTML = data.halls.map((h, i) => `
+        <button type="button" class="hall-card${h.name === activeHall ? ' hall-card--active' : ''}" data-hall="${escapeHtml(h.name)}">
+          <div class="hall-card__icon">${icons[i % icons.length]}</div>
+          <div class="hall-card__name">${escapeHtml(h.name)}</div>
+          <div class="hall-card__desc">Зал ресторану</div>
+        </button>`).join('')
+    })
+    .catch(() => {})
 }
 
 /* ---- Time Slots ---- */
