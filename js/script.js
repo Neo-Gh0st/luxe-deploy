@@ -287,11 +287,22 @@ function showAdminPanel() {
 }
 
 /* ---- Admin: Stats ---- */
+function adminFetch(path, options) {
+  return fetch(`${API_URL}${path}`, Object.assign({ credentials: 'include' }, options))
+    .then(res => {
+      if (res.status === 401) {
+        showAdminLogin()
+        return null
+      }
+      return res
+    })
+}
+
 function loadAdminStats() {
-  fetch(`${API_URL}/api/admin/stats`, { credentials: 'include' })
-    .then(res => res.json())
+  adminFetch('/api/admin/stats')
+    .then(res => res ? res.json() : null)
     .then(data => {
-      if (!data.ok || !data.stats) return
+      if (!data || !data.ok || !data.stats) return
       const s = data.stats
       const bEl = document.getElementById('statTodayBookings')
       const gEl = document.getElementById('statTodayGuests')
@@ -360,13 +371,13 @@ function initBookingFilters() {
 }
 
 function loadAdminBookings(statusFilter = 'all') {
-  fetch(`${API_URL}/api/admin/bookings?status=${statusFilter}`, { credentials: 'include' })
-    .then(res => res.json())
+  adminFetch(`/api/admin/bookings?status=${statusFilter}`)
+    .then(res => res ? res.json() : null)
     .then(data => {
       const wrap = document.getElementById('adminBookingsWrap')
       const empty = document.getElementById('adminBookingsEmpty')
       const tbody = document.getElementById('adminBookingsBody')
-      if (!tbody) return
+      if (!tbody || !data) return
 
       if (!data.bookings || !data.bookings.length) {
         if (wrap) wrap.hidden = true
@@ -462,11 +473,11 @@ function initHallFilters() {
 }
 
 function loadAdminTables(hallFilter = 'all') {
-  fetch(`${API_URL}/api/admin/tables`, { credentials: 'include' })
-    .then(res => res.json())
+  adminFetch('/api/admin/tables')
+    .then(res => res ? res.json() : null)
     .then(data => {
       const grid = document.getElementById('adminTablesGrid')
-      if (!grid || !data.tables) return
+      if (!grid || !data || !data.tables) return
 
       let list = data.tables
       if (hallFilter && hallFilter !== 'all') {
@@ -517,11 +528,11 @@ window.cycleTableStatus = function(id, currentStatus) {
 
 /* ---- Admin: Staff ---- */
 function loadAdminStaff() {
-  fetch(`${API_URL}/api/admin/staff`, { credentials: 'include' })
-    .then(res => res.json())
+  adminFetch('/api/admin/staff')
+    .then(res => res ? res.json() : null)
     .then(data => {
       const tbody = document.getElementById('adminStaffBody')
-      if (!tbody || !data.staff) return
+      if (!tbody || !data || !data.staff) return
 
       tbody.innerHTML = data.staff.map(s => {
         const isOnShift = s.shift_status === 'on'
@@ -627,11 +638,11 @@ function initStaffModal() {
 
 /* ---- Admin: Stop List ---- */
 function loadAdminStopList() {
-  fetch(`${API_URL}/api/admin/stop-list`, { credentials: 'include' })
-    .then(res => res.json())
+  adminFetch('/api/admin/stop-list')
+    .then(res => res ? res.json() : null)
     .then(data => {
       const grid = document.getElementById('adminStoplistGrid')
-      if (!grid || !data.items) return
+      if (!grid || !data || !data.items) return
 
       grid.innerHTML = data.items.map(item => {
         const isAvailable = !item.is_stopped
@@ -679,9 +690,10 @@ let adminUsersCache = {}
 let pendingDeleteUserId = null
 
 function loadAdminUsers() {
-  fetch(`${API_URL}/api/admin/users`, { credentials: 'include' })
+  adminFetch('/api/admin/users')
     .then(res => {
-      if (!res.ok) throw new Error('Unauthorized')
+      if (!res) return null
+      if (!res.ok) throw new Error('Failed')
       return res.json()
     })
     .then(data => {
@@ -689,7 +701,7 @@ function loadAdminUsers() {
       const empty = document.getElementById('adminEmpty')
       const tbody = document.getElementById('adminTableBody')
       const countEl = document.getElementById('adminUsersCount')
-      if (!tbody) return
+      if (!tbody || !data) return
 
       if (!data.users || !data.users.length) {
         adminUsersCache = {}
@@ -900,6 +912,8 @@ function initBookingForm() {
   if (dateInput) {
     const today = new Date().toISOString().split('T')[0]
     dateInput.setAttribute('min', today)
+    const maxDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    dateInput.setAttribute('max', maxDate)
 
     dateInput.addEventListener('change', () => {
       if (dateInput.value) {
@@ -969,6 +983,17 @@ function initBookingForm() {
           const codeDisplay = document.getElementById('bookingCodeDisplay')
           if (codeDisplay) codeDisplay.textContent = b.booking_code
 
+          const tableInfo = document.getElementById('bookingTableInfo')
+          if (tableInfo) {
+            if (data.table) {
+              tableInfo.textContent = `✅ За вами попередньо закріплено столик №${data.table.number} (${data.table.hall}, до ${data.table.capacity} персон)`
+              tableInfo.style.display = 'block'
+            } else {
+              tableInfo.textContent = 'Вільних столиків у цьому залі зараз немає — адміністратор підтвердить бронювання вручну.'
+              tableInfo.style.display = 'block'
+            }
+          }
+
           const tgBtn = document.getElementById('bookingTelegramBtn')
           if (tgBtn && data.telegramUrl) tgBtn.href = data.telegramUrl
 
@@ -991,6 +1016,11 @@ function initBookingForm() {
       form.style.display = ''
       if (telegramStep) telegramStep.style.display = 'none'
       if (successEl) successEl.style.display = 'none'
+      const tableInfo = document.getElementById('bookingTableInfo')
+      if (tableInfo) {
+        tableInfo.style.display = 'none'
+        tableInfo.textContent = ''
+      }
       timeGroup.style.display = 'none'
       document.querySelectorAll('.time-slot--active').forEach(el => el.classList.remove('time-slot--active'))
       const submitBtn = document.getElementById('bookingSubmit')
@@ -1034,9 +1064,13 @@ function showFinalBookingSuccess(booking) {
 
   if (detailsEl) {
     const dateStr = new Date(booking.booking_date).toLocaleDateString('uk-UA')
+    const tableLine = booking.table_num
+      ? `🪑 Столик: <strong>№${booking.table_num}</strong> (${booking.hall})<br>`
+      : ''
     detailsEl.innerHTML = `
       Номер <strong>${booking.phone || ''}</strong> успішно підтверджено через Telegram! ✨<br>
       📅 <strong>${dateStr}</strong> о <strong>${booking.booking_time}</strong> (${booking.hall})<br>
+      ${tableLine}
       👥 Гостей: <strong>${booking.guests_count}</strong> | Код броні: <strong>${booking.booking_code}</strong>
     `
   }
