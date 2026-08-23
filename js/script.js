@@ -1000,6 +1000,7 @@ function initBookingForm() {
 
     fetch(`${API_URL}/api/bookings`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         guest_name,
