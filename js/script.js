@@ -145,7 +145,10 @@ function initDashboardPage() {
       return res.json()
     })
     .then(data => {
-      if (data) fillDashboard(data.user)
+      if (data) {
+        fillDashboard(data.user)
+        loadUserBookings()
+      }
     })
     .catch(() => {
       window.location.href = 'auth.html'
@@ -160,6 +163,39 @@ function initDashboardPage() {
         })
     })
   }
+}
+
+function loadUserBookings() {
+  const wrap = document.getElementById('userBookings')
+  const empty = document.getElementById('bookingsEmpty')
+  if (!wrap) return
+
+  fetch(`${API_URL}/api/my/bookings`, { credentials: 'include' })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      if (!data || !data.bookings || !data.bookings.length) return
+      if (empty) empty.style.display = 'none'
+
+      const statusMap = {
+        pending: '⏳ Очікує підтвердження',
+        confirmed: '✅ Підтверджена',
+        completed: '🏁 Завершена',
+        cancelled: '❌ Скасована'
+      }
+
+      wrap.innerHTML = data.bookings.map(b => {
+        const dateStr = new Date(b.booking_date).toLocaleDateString('uk-UA')
+        const tableText = b.table_num ? ` • Стіл №${b.table_num}` : ''
+        return `<div class="booking-card">
+          <div class="booking-card__info">
+            <h3>${dateStr} о ${b.booking_time}</h3>
+            <div class="booking-card__meta">${escapeHtml(b.hall)}${tableText} • 👥 ${b.guests_count} гостей • 🔖 ${b.booking_code}</div>
+          </div>
+          <span class="status-badge status-badge--${b.status}">${statusMap[b.status] || escapeHtml(b.status)}</span>
+        </div>`
+      }).join('')
+    })
+    .catch(() => {})
 }
 
 function initAdminPage() {
@@ -1093,6 +1129,13 @@ function showFinalBookingSuccess(booking) {
   }
 }
 
+function showBookingForm() {
+  const form = document.getElementById('bookingForm')
+  const gate = document.getElementById('bookingAuthGate')
+  if (form) form.style.display = ''
+  if (gate) gate.style.display = 'none'
+}
+
 function renderBookingGateButton(attempt) {
   const gateBtn = document.getElementById('bookingGoogleBtn')
   if (!gateBtn) return
@@ -1137,13 +1180,19 @@ function initBookingAuthGate() {
       return res.json()
     })
     .then(data => {
-      if (!data || !data.user) return
-      const nameInput = document.getElementById('bookingName')
-      if (nameInput && !nameInput.value && data.user.name) {
-        nameInput.value = data.user.name
+      if (data && data.user) {
+        showBookingForm()
+        const nameInput = document.getElementById('bookingName')
+        if (nameInput && !nameInput.value && data.user.name) {
+          nameInput.value = data.user.name
+        }
       }
+      // якщо data відсутнє — гейт уже показано вище по 401
     })
-    .catch(() => showBookingGate())
+    .catch(() => {
+      // тимчасова мережева помилка: показуємо форму, сервер сам перевірить сесію
+      showBookingForm()
+    })
 }
 
 /* ---- Guest Counter ---- */
