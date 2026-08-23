@@ -1180,6 +1180,7 @@ function initBookingForm() {
   if (!form) return
 
   initBookingAuthGate()
+  loadBookingHalls()
 
   if (dateInput) {
     const today = new Date().toISOString().split('T')[0]
@@ -1263,10 +1264,10 @@ function initBookingForm() {
           const tableInfo = document.getElementById('bookingTableInfo')
           if (tableInfo) {
             if (data.table) {
-              tableInfo.textContent = `✓ Ми вже тримаємо для вас столик №${data.table.number} у залі «${data.table.hall}» — до ${data.table.capacity} персон`
+              tableInfo.textContent = `✅ За вами попередньо закріплено столик №${data.table.number} (${data.table.hall}, до ${data.table.capacity} персон)`
               tableInfo.style.display = 'block'
             } else {
-              tableInfo.textContent = 'У цьому залі на обраний час вільних столиків не залишилось. Передамо заявку адміністратору — він підтвердить особисто.'
+              tableInfo.textContent = 'Вільних столиків у цьому залі зараз немає — адміністратор підтвердить бронювання вручну.'
               tableInfo.style.display = 'block'
             }
           }
@@ -1345,7 +1346,7 @@ function showFinalBookingSuccess(booking) {
       ? `🪑 Столик: <strong>№${booking.table_num}</strong> (${booking.hall})<br>`
       : ''
     detailsEl.innerHTML = `
-      Готово! Номер підтверджено в Telegram — столик чекає на вас ✨<br>
+      Номер <strong>${booking.phone || ''}</strong> успішно підтверджено через Telegram! ✨<br>
       📅 <strong>${dateStr}</strong> о <strong>${booking.booking_time}</strong> (${booking.hall})<br>
       ${tableLine}
       👥 Гостей: <strong>${booking.guests_count}</strong> | Код броні: <strong>${booking.booking_code}</strong>

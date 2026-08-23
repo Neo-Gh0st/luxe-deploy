@@ -6,7 +6,7 @@
   <title>Бронювання — LUXE Restaurant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260824">
+  <link rel="stylesheet" href="css/style.css?v=20260826">
 </head>
 <body>
 
@@ -39,19 +39,19 @@
   <div class="container">
     <div class="section-header animate-on-scroll">
       <h2>Бронювання столика</h2>
-      <p>Оберіть зручний час та місце для вашого вечора</p>
+      <p>Кілька полів — і столик ваш</p>
       <div class="divider"></div>
     </div>
 
     <!-- Auth gate: booking requires login -->
     <div class="auth-card animate-on-scroll" id="bookingAuthGate" style="display:none;float:none;margin:0 auto 48px;">
       <div class="auth-card__logo gold-gradient">LUXE</div>
-      <p class="auth-card__subtitle">🔒 Бронювання столиків доступне після входу</p>
+      <p class="auth-card__subtitle">🔒 Спершу — швидкий вхід</p>
       <div class="auth-error" id="bookingGateError"></div>
       <div class="auth-card__buttons">
         <div id="bookingGoogleBtn"></div>
       </div>
-      <p class="auth-card__footer">Увійдіть через Google-акаунт, щоб забронювати столик</p>
+      <p class="auth-card__footer">Це буквально хвилина — і форма бронювання ваша</p>
     </div>
 
     <form class="booking-form animate-on-scroll" id="bookingForm" style="display:none;">
@@ -137,7 +137,7 @@
       <div class="success-state__icon" style="font-size:3rem;">📱</div>
       <h3>Підтвердження в Telegram</h3>
       <p style="max-width:520px;margin:0 auto 20px;line-height:1.6;">
-        Для підтвердження столика та верифікації номера перейдіть у нашого Telegram-бота <strong>@LUXE_Restaurant_bot</strong> та натисніть кнопку «Поділитися контактом».
+        Ми не обдзвонюємо гостей для підтвердження — просто зайдіть до бота <strong>@LUXE_Restaurant_bot</strong> і поділіться номером. Хвилина — і жодних фейкових броней.
       </p>
       <div style="margin-bottom:24px;">
         <span class="admin-badge admin-badge--admin" id="bookingCodeDisplay" style="font-size:1.1rem;padding:8px 20px;letter-spacing:2px;">LUXE-....</span>
@@ -150,7 +150,7 @@
         </a>
       </div>
       <div style="margin-top:20px;font-size:0.9rem;color:var(--color-text-muted);" id="bookingPollingStatus">
-        ⏳ Очікуємо підтвердження у боті...
+        ⏳ Чекаємо, поки ви підтвердите номер у боті...
       </div>
     </div>
 
@@ -171,7 +171,7 @@
     <div class="footer__grid">
       <div>
         <div class="footer__logo gold-gradient">LUXE</div>
-        <p class="footer__desc">Ресторан високої кухні в самому серці Києва.</p>
+        <p class="footer__desc">Ми на Хрещатику, 22 — заходьте, будемо раді.</p>
       </div>
       <div>
         <div class="footer__heading">Навігація</div>
@@ -203,6 +203,6 @@
 </footer>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="js/script.js?v=20260824"></script>
+<script src="js/script.js?v=20260826"></script>
 </body>
 </html>

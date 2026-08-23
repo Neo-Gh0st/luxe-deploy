@@ -6,8 +6,8 @@
   <title>Адмін-панель — LUXE Restaurant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=20260825">
-  <link rel="stylesheet" href="css/admin.css?v=20260825">
+  <link rel="stylesheet" href="css/style.css?v=20260826">
+  <link rel="stylesheet" href="css/admin.css?v=20260826">
 </head>
 <body class="admin-body">
 
@@ -161,7 +161,7 @@
           </div>
           <div class="bookings-empty" id="adminBookingsEmpty" hidden>
             <div class="bookings-empty__icon">🍽️</div>
-            <p>Бронювань у цій категорії поки немає</p>
+            <p>Поки тихо — бронювань у цій категорії немає</p>
           </div>
         </div>
 
@@ -169,7 +169,7 @@
         <div class="admin-tab-content" id="tabContentTables" hidden>
           <div class="admin-toolbar admin-toolbar--column">
             <div class="admin-toolbar__row">
-              <p class="admin-toolbar__hint">Зали ресторану — додавайте та видаляйте категорії (Тераса, VIP тощо)</p>
+              <p class="admin-toolbar__hint">Зали: додайте новий — або приберіть той, що не потрібен</p>
               <button type="button" class="btn btn--primary admin-toolbar__add" id="btnOpenAddHallModal">+ Додати зал</button>
             </div>
             <div class="admin-halls-chips" id="adminHallsChips"></div>
@@ -212,7 +212,7 @@
         <!-- TAB 4: STOP LIST -->
         <div class="admin-tab-content" id="tabContentStoplist" hidden>
           <div class="admin-toolbar">
-            <p class="admin-toolbar__hint">Керування доступністю страв та напоїв у меню</p>
+            <p class="admin-toolbar__hint">Вимкайте страву, якщо вона закінчилась — оновиться всюди</p>
             <button type="button" class="btn btn--primary admin-toolbar__add" id="btnOpenAddStopItemModal">+ Додати страву</button>
           </div>
           <div class="admin-stoplist-grid" id="adminStoplistGrid"></div>
@@ -379,6 +379,6 @@
     </div>
   </div>
 
-<script src="js/script.js?v=20260825"></script>
+<script src="js/script.js?v=20260826"></script>
 </body>
 </html>
